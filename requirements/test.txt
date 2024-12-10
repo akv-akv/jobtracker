@@ -1,0 +1,7 @@
+-r prod.txt
+hypothesis
+pytest
+pytest-cov
+pytest-mock
+pytest-xdist
+tox
