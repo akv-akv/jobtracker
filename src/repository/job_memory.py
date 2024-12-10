@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
@@ -57,24 +56,18 @@ class InMemoryJobRepository(JobRepository):
     def _apply_date_filters(
         self, jobs: List[Job], filters: dict, date_field: str
     ) -> List[Job]:
-        """
-        Apply date filters (__eq, __gt, __lt) to
-        the given list of jobs based on the specified field.
-        """
+        """Apply date filters (__eq, __gt, __lt) to the given list of jobs."""
         date_eq = filters.get(f"{date_field}__eq")
         date_gt = filters.get(f"{date_field}__gt")
         date_lt = filters.get(f"{date_field}__lt")
 
         if date_eq:
-            date_eq = datetime.strptime(date_eq, "%Y-%m-%d")
             jobs = [job for job in jobs if getattr(job, date_field) == date_eq]
 
         if date_gt:
-            date_gt = datetime.strptime(date_gt, "%Y-%m-%d")
             jobs = [job for job in jobs if getattr(job, date_field) >= date_gt]
 
         if date_lt:
-            date_lt = datetime.strptime(date_lt, "%Y-%m-%d")
             jobs = [job for job in jobs if getattr(job, date_field) <= date_lt]
 
         return jobs

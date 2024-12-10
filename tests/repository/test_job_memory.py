@@ -24,6 +24,8 @@ def sample_job():
         country="USA",
         city="New York",
         description="A challenging and rewarding job opportunity.",
+        date_applied=datetime(2023, 1, 1),
+        date_updated=datetime(2023, 1, 2),
     )
 
 
@@ -98,57 +100,164 @@ def test_list_jobs_empty(repository):
 
 
 @pytest.fixture
-def add_two_jobs(repository):
-    repository.jobs = {
-        uuid4(): Job(
+def repository_with_jobs():
+    """Fixture to populate the repository with sample jobs."""
+    repo = InMemoryJobRepository()
+    repo.create(
+        Job(
             id=uuid4(),
-            title="Engineer",
+            title="Software Engineer",
             company="TechCorp",
             status=JobStatus.APPLIED,
             country="USA",
             city="NY",
             description="Job 1",
-            date_applied=datetime(2023, 1, 2),
+            date_applied=datetime(2023, 1, 10),
             date_updated=datetime(2023, 6, 15),
-        ),
-        uuid4(): Job(
+        )
+    )
+    repo.create(
+        Job(
             id=uuid4(),
-            title="Manager",
+            title="Product Manager",
             company="BizCorp",
             status=JobStatus.INTERVIEWING,
             country="USA",
             city="SF",
             description="Job 2",
-            date_applied=datetime(2023, 3, 1),
+            date_applied=datetime(2023, 3, 5),
             date_updated=datetime(2023, 7, 20),
+        )
+    )
+    repo.create(
+        Job(
+            id=uuid4(),
+            title="Data Scientist",
+            company="DataCorp",
+            status=JobStatus.REJECTED,
+            country="Canada",
+            city="Toronto",
+            description="Job 3",
+            date_applied=datetime(2023, 2, 15),
+            date_updated=datetime(2023, 5, 30),
+        )
+    )
+    return repo
+
+
+def test_list_all_jobs(repository_with_jobs):
+    """Test listing all jobs without filters."""
+    result = repository_with_jobs.list()
+    assert len(result) == 3  # Ensure all jobs are returned
+
+
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"status": [JobStatus.APPLIED]}, ["Software Engineer"]),
+        ({"status": [JobStatus.INTERVIEWING]}, ["Product Manager"]),
+        ({"status": [JobStatus.REJECTED]}, ["Data Scientist"]),
+    ],
+)
+def test_list_jobs_by_status(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by status."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
+
+
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"company": "TechCorp"}, ["Software Engineer"]),
+        ({"company": "BizCorp"}, ["Product Manager"]),
+        ({"company": "DataCorp"}, ["Data Scientist"]),
+    ],
+)
+def test_list_jobs_by_company(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by company."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
+
+
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"country": "USA"}, ["Software Engineer", "Product Manager"]),
+        ({"country": "Canada"}, ["Data Scientist"]),
+    ],
+)
+def test_list_jobs_by_country(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by country."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
+
+
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"city": "NY"}, ["Software Engineer"]),
+        ({"city": "SF"}, ["Product Manager"]),
+        ({"city": "Toronto"}, ["Data Scientist"]),
+    ],
+)
+def test_list_jobs_by_city(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by city."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
+
+
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"date_applied__eq": datetime(2023, 1, 10)}, ["Software Engineer"]),
+        (
+            {"date_applied__gt": datetime(2023, 2, 1)},
+            ["Product Manager", "Data Scientist"],
         ),
-    }
-    return repository
+        (
+            {"date_applied__lt": datetime(2023, 3, 1)},
+            ["Software Engineer", "Data Scientist"],
+        ),
+    ],
+)
+def test_list_jobs_by_date_applied(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by date_applied."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
 
 
-def test_list_jobs_with_date_filters(repository):
-    filters = {"date_applied__gt": "2023-01-01"}
-    result = repository.list(filters)
-    assert len(result) == 2
+@pytest.mark.parametrize(
+    "filters,expected_titles",
+    [
+        ({"date_updated__eq": datetime(2023, 6, 15)}, ["Software Engineer"]),
+        (
+            {"date_updated__gt": datetime(2023, 6, 1)},
+            ["Software Engineer", "Product Manager"],
+        ),
+        ({"date_updated__lt": datetime(2023, 6, 1)}, ["Data Scientist"]),
+    ],
+)
+def test_list_jobs_by_date_updated(repository_with_jobs, filters, expected_titles):
+    """Test listing jobs filtered by date_updated."""
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
+    assert titles == expected_titles
 
-    filters = {"date_applied__lt": "2023-03-01"}
-    result = repository.list(filters)
-    assert len(result) == 1
-    assert result[0].title == "Engineer"
 
-    filters = {"date_updated__lt": "2023-07-01"}
-    result = repository.list(filters)
-    assert len(result) == 1
-    assert result[0].title == "Engineer"
-
-
-def test_list_jobs_with_multiple_filters(repository):
+def test_list_jobs_with_multiple_filters(repository_with_jobs):
+    """Test listing jobs with multiple filters."""
     filters = {
-        "status": ["APPLIED"],
+        "status": [JobStatus.APPLIED],
         "company": "TechCorp",
-        "date_applied__gt": "2023-01-01",
+        "country": "USA",
+        "date_applied__gt": datetime(2023, 1, 1),
     }
-    result = repository.list(filters)
+    result = repository_with_jobs.list(filters)
+    titles = [job.title for job in result]
     assert len(result) == 1
-    assert result[0].status == JobStatus.APPLIED
-    assert result[0].company == "TechCorp"
+    assert titles == ["Software Engineer"]

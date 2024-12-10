@@ -1,14 +1,10 @@
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from src.requests.base_request import InvalidRequest, ValidRequest
 
-ACCEPTED_FILTERS = [
-    "status",
-    "company",
-    "country",
-    "city",
+DATE_FILTERS = [
     "date_applied__eq",
     "date_applied__gt",
     "date_applied__lt",
@@ -17,13 +13,29 @@ ACCEPTED_FILTERS = [
     "date_updated__lt",
 ]
 
+TEXT_FILTERS = [
+    "status",
+    "company",
+    "country",
+    "city",
+]
+
+ACCEPTED_FILTERS = DATE_FILTERS + TEXT_FILTERS
+
+
+def parse_date(date_str: str) -> datetime:
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        raise ValueError(f"Invalid date format: {date_str}. Expected YYYY-MM-DD.")
+
 
 def build_job_list_request(
-    filters: Optional[Mapping] = None,
+    filters: Optional[Dict[str, Any]] = None,
 ) -> Union[ValidRequest, InvalidRequest]:
     invalid_req = InvalidRequest()
 
-    if filters is not None:
+    if filters:
         if not isinstance(filters, Mapping):
             invalid_req.add_error("filters", "Must be a dictionary")
             return invalid_req
@@ -32,6 +44,13 @@ def build_job_list_request(
             if key not in ACCEPTED_FILTERS:
                 invalid_req.add_error("filters", f"Key '{key}' is not accepted")
                 continue
+
+            if key in DATE_FILTERS:
+                try:
+                    filters[key] = parse_date(value)
+                except ValueError as e:
+                    invalid_req.add_error(key, str(e))
+                    continue
 
             # Validate multiple statuses
             if key == "status":
