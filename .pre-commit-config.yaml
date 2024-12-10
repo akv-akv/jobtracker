@@ -13,6 +13,7 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+        exclude: tests/
 
   - repo: https://github.com/pycqa/flake8
     rev: 7.1.1
@@ -29,6 +30,8 @@ repos:
       -   id: debug-statements
       -   id: double-quote-string-fixer
       -   id: name-tests-test
+          args:
+            - "--pytest-test-first"
       -   id: requirements-txt-fixer
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
