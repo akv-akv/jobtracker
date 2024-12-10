@@ -24,3 +24,9 @@ def test_job_serializer(job):
     assert job_dict["platform"] == job.platform
     assert job_dict["date_applied"] == job.date_applied.isoformat()
     assert job_dict["date_updated"] == job.date_updated.isoformat()
+
+
+def test_job_serializer_with_different_class():
+    d = {"a": "1"}
+    serialized_dict = json.dumps(d, cls=JobJsonEncoder)
+    assert serialized_dict == '{"a": "1"}'
