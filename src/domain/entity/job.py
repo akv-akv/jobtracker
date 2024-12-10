@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import date
 from enum import Enum, auto
 from typing import Optional
@@ -26,3 +26,10 @@ class Job:
     platform: Optional[str] = None
     date_applied: date = date.today()
     date_updated: date = date.today()
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
+
+    def to_dict(self):
+        return asdict(self)
