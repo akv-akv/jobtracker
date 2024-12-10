@@ -57,7 +57,7 @@ ignore_missing_imports = true
 explicit-package-bases = true
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report=term-missing --hypothesis-show-statistics"
+addopts = "--cov=src --cov-report=term-missing --hypothesis-show-statistics"
 testpaths = ["tests"]
 filterwarnings = [
     "error",

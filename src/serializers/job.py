@@ -12,7 +12,7 @@ class JobJsonEncoder(JSONEncoder):
                 "id": str(o.id),
                 "title": o.title,
                 "company": o.company,
-                "status": o.status.value,
+                "status": o.status.name,
                 "country": o.country,
                 "city": o.city,
                 "description": o.description,

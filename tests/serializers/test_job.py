@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from hypothesis import given
 
 from src.serializers.job import JobJsonEncoder
@@ -13,7 +14,7 @@ def test_job_serializer(job):
     job_dict = json.loads(serialized_job)
 
     assert job_dict["id"] == str(job.id)
-    assert job_dict["status"] == job.status.value
+    assert job_dict["status"] == job.status.name
     assert job_dict["title"] == job.title
     assert job_dict["company"] == job.company
     assert job_dict["country"] == job.country
@@ -26,7 +27,23 @@ def test_job_serializer(job):
     assert job_dict["date_updated"] == job.date_updated.isoformat()
 
 
-def test_job_serializer_with_different_class():
-    d = {"a": "1"}
-    serialized_dict = json.dumps(d, cls=JobJsonEncoder)
-    assert serialized_dict == '{"a": "1"}'
+class UnserializableObject:
+    pass
+
+
+def test_job_json_encoder_fallback():
+    # Create an instance of an unserializable object
+    obj = UnserializableObject()
+
+    # Instantiate the custom encoder
+    encoder = JobJsonEncoder()
+
+    # Try encoding the object, which should trigger the fallback
+    with pytest.raises(TypeError) as exc_info:
+        encoder.default(obj)
+
+    # Assert the error message matches the expected fallback behavior
+    assert (
+        str(exc_info.value)
+        == "Object of type UnserializableObject is not JSON serializable"
+    )
