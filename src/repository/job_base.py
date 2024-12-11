@@ -25,5 +25,5 @@ class JobRepository(ABC):  # pragma: no cover
         pass
 
     @abstractmethod
-    def list(self) -> List[Job]:
+    def list(self, filters) -> List[Job]:
         pass
