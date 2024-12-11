@@ -46,7 +46,7 @@ def test_build_job_list_request_invalid_date():
 
 def test_build_job_list_request_valid_filters():
     filters = {
-        "status": ["APPLIED", "INTERVIEWINGp"],
+        "status": ["APPLIED", "INTERVIEWING"],
         "date_applied__gt": "2023-01-01",
         "date_updated__lt": "2023-12-31",
     }

@@ -2,6 +2,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
 
+from src.domain.entity.job import JobStatus
 from src.requests.base_request import InvalidRequest, ValidRequest
 
 DATE_FILTERS = [
@@ -46,6 +47,8 @@ def build_job_list_request(
 ) -> Union[ListJobsValidRequest, ListJobsInvalidRequest]:
     invalid_req = ListJobsInvalidRequest()
 
+    print(filters)
+
     if filters:
         if not isinstance(filters, Mapping):
             invalid_req.add_error("filters", "Must be a dictionary")
@@ -67,7 +70,15 @@ def build_job_list_request(
             if key == "status":
                 if not isinstance(value, list):
                     invalid_req.add_error("status", "Must be a list of statuses")
-                continue
+                    continue
+                try:
+                    filters[key] = [
+                        JobStatus[status] if isinstance(status, str) else status
+                        for status in value
+                    ]
+                except KeyError as e:
+                    invalid_req.add_error("status", f"Invalid status: {str(e)}")
+                    continue
 
             # Validate date filters
             if key.startswith("date_applied") or key.startswith("date_updated"):
