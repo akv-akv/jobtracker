@@ -1,4 +1,4 @@
-from src.requests.job_list_request import build_job_list_request
+from src.requests.list_jobs import build_job_list_request
 
 
 def test_build_job_list_request_no_filters():

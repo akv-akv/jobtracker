@@ -1,5 +1,5 @@
 class InvalidRequest:
-    """Base class for invalid requests."""
+    """Represents an invalid request with errors."""
 
     def __init__(self):
         self.errors = []
@@ -15,10 +15,7 @@ class InvalidRequest:
 
 
 class ValidRequest:
-    """Base class for valid requests."""
-
-    def __init__(self, filters=None):
-        self.filters = filters
+    """Represents a valid request."""
 
     def __bool__(self):
         return True

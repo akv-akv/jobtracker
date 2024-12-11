@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.repository.job_base import JobRepository
-from src.requests.job_list_request import InvalidRequest, build_job_list_request
+from src.requests.list_jobs import InvalidRequest, build_job_list_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 

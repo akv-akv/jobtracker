@@ -23,6 +23,17 @@ TEXT_FILTERS = [
 ACCEPTED_FILTERS = DATE_FILTERS + TEXT_FILTERS
 
 
+class ListJobsValidRequest(ValidRequest):
+    """Request for adding a job."""
+
+    def __init__(self, filters: Optional[dict]):
+        self.filters = filters
+
+
+class ListJobsInvalidRequest(InvalidRequest):
+    pass
+
+
 def parse_date(date_str: str) -> datetime:
     try:
         return datetime.strptime(date_str, "%Y-%m-%d")
@@ -32,8 +43,8 @@ def parse_date(date_str: str) -> datetime:
 
 def build_job_list_request(
     filters: Optional[Dict[str, Any]] = None,
-) -> Union[ValidRequest, InvalidRequest]:
-    invalid_req = InvalidRequest()
+) -> Union[ListJobsValidRequest, ListJobsInvalidRequest]:
+    invalid_req = ListJobsInvalidRequest()
 
     if filters:
         if not isinstance(filters, Mapping):
@@ -68,4 +79,4 @@ def build_job_list_request(
         if invalid_req.has_errors():
             return invalid_req
 
-    return ValidRequest(filters=filters)
+    return ListJobsValidRequest(filters=filters)
