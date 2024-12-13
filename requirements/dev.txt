@@ -22,7 +22,9 @@ cfgv==3.4.0
 chardet==5.2.0
     # via tox
 click==8.1.7
-    # via black
+    # via
+    #   black
+    #   typer
 colorama==0.4.6
     # via tox
 coverage[toml]==7.6.9
@@ -67,12 +69,16 @@ jedi==0.19.2
     # via ipython
 mako==1.3.8
     # via alembic
+markdown-it-py==3.0.0
+    # via rich
 markupsafe==3.0.2
     # via mako
 matplotlib-inline==0.1.7
     # via ipython
 mccabe==0.7.0
     # via flake8
+mdurl==0.1.2
+    # via markdown-it-py
 mypy==1.13.0
     # via -r requirements/dev.in
 mypy-extensions==1.0.0
@@ -124,6 +130,7 @@ pygments==2.18.0
     # via
     #   ipython
     #   pdbpp
+    #   rich
 pyproject-api==1.8.0
     # via tox
 pyrepl==0.9.0
@@ -142,8 +149,12 @@ pytest-xdist==3.6.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pyyaml==6.0.2
     # via pre-commit
+rich==13.9.4
+    # via typer
 ruff==0.8.2
     # via -r requirements/dev.in
+shellingham==1.5.4
+    # via typer
 snowballstemmer==2.2.0
     # via pydocstyle
 sortedcontainers==2.4.0
@@ -160,11 +171,14 @@ traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
+typer==0.15.1
+    # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 typing-extensions==4.12.2
     # via
     #   alembic
     #   mypy
     #   sqlalchemy
+    #   typer
 virtualenv==20.28.0
     # via
     #   pre-commit
