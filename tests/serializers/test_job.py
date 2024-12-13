@@ -4,7 +4,7 @@ import pytest
 from hypothesis import given
 
 from src.serializers.job import JobJsonEncoder
-from tests.src.domain.entity.test_job import job_strategy
+from tests.domain.entity.test_job import job_strategy
 
 
 @given(job=job_strategy())

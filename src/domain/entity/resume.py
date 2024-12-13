@@ -20,8 +20,8 @@ class Experience:
 @dataclass
 class Resume:
     id: UUID
-    name: str
-    summary: str
+    candidate_name: str
+    summary: Optional[str]
     skills: List[str] = field(default_factory=list)
     location: Optional[str] = None
     phone: Optional[str] = None
@@ -30,3 +30,4 @@ class Resume:
     version: int = 1
     parent_id: Optional[UUID] = None
     experiences: List[Experience] = field(default_factory=list)
+    resume_name: Optional[str] = None

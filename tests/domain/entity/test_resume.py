@@ -48,7 +48,7 @@ def test_resume_creation():
     """Test Resume instantiation with all fields."""
     resume = Resume(
         id=uuid4(),
-        name="John Doe",
+        candidate_name="John Doe",
         summary="Experienced Data Engineer skilled in "
         "Python, SQL, and Cloud Solutions.",
         skills="Python, SQL, ETL, AWS",
@@ -58,7 +58,7 @@ def test_resume_creation():
         linkedin="https://linkedin.com/in/johndoe",
     )
 
-    assert resume.name == "John Doe"
+    assert resume.candidate_name == "John Doe"
     assert resume.summary.startswith("Experienced Data Engineer")
     assert "Python" in resume.skills
     assert resume.version == 1  # Default version
@@ -70,7 +70,7 @@ def test_resume_add_experience():
     """Test adding experiences to a resume."""
     resume = Resume(
         id=uuid4(),
-        name="John Doe",
+        candidate_name="John Doe",
         summary="Experienced Data Engineer skilled in "
         "Python, SQL, and Cloud Solutions.",
         skills="Python, SQL, ETL, AWS",
