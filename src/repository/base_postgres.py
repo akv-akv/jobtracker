@@ -50,13 +50,16 @@ class BasePostgresRepository(Generic[T, D]):
                     query = query.filter(getattr(self.model, key) == value)
         return [self.to_domain(orm_obj) for orm_obj in query.all()]
 
-    def update(self, obj_id, **kwargs) -> Optional[D]:
+    def update(self, obj_id, data) -> Optional[D]:
         """Update an existing object."""
         orm_obj = self.session.query(self.model).filter_by(id=obj_id).first()
         if not orm_obj:
             return None
-        for key, value in kwargs.items():
+
+        for key, value in data.items():
             if hasattr(orm_obj, key):
                 setattr(orm_obj, key, value)
+
         self.session.commit()
+
         return self.to_domain(orm_obj)

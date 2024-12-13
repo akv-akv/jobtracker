@@ -15,14 +15,9 @@ def update_job(data, repository: JobRepository):
         job = repository.read(request.data["id"])
         if not job:
             return ResponseFailure(ResponseTypes.RESOURCE_ERROR, "Job not found.")
-
-        # Update only the fields provided in the request
-        for key, value in request.data.items():
-            if key != "id":  # Skip ID, as it should not change
-                setattr(job, key, value)
-
         # Save the updated job back to the repository
-        repository.update(job)
+        repository.update(job.id, data)
+        job = repository.read(request.data["id"])
         return ResponseSuccess(job)
     except ValueError as e:
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, str(e))

@@ -13,7 +13,7 @@
   },
   {
     "name": "POSTGRES_PORT",
-    "value": "5435"
+    "value": "5432"
   },
   {
     "name": "POSTGRES_PASSWORD",

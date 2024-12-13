@@ -17,7 +17,7 @@ class JobRepository(ABC):  # pragma: no cover
         pass
 
     @abstractmethod
-    def update(self, job: Job) -> None:
+    def update(self, job_id, data) -> None:
         pass
 
     @abstractmethod

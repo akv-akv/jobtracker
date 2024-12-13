@@ -47,7 +47,8 @@ def test_repository_update_job(pg_session_with_jobs):
     """Test updating a job."""
     repo = JobRepositoryPostgres(pg_session_with_jobs)
     job_id = "f853578c-fc0f-4e65-81b8-566c5dffa35a"
-    repo.update(job_id, title="Updated Software Engineer", status=JobStatus.OFFERED)
+    data = {"title": "Updated Software Engineer", "status": "OFFERED"}
+    repo.update(job_id, data)
     updated_job = repo.read(job_id)
     assert updated_job.title == "Updated Software Engineer"
     assert updated_job.status == JobStatus.OFFERED

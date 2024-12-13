@@ -58,18 +58,16 @@ def test_read_nonexistent_job(repository):
 def test_update_job(repository, sample_job):
     """Test updating an existing job."""
     repository.create(sample_job)
-    updated_title = "Senior Software Engineer"
-    sample_job.title = updated_title
-
-    repository.update(sample_job)
+    data = {"title": "Senior Software Engineer"}
+    repository.update(job_id=sample_job.id, data=data)
     job = repository.read(sample_job.id)
-    assert job.title == updated_title
+    assert job.title == data["title"]
 
 
 def test_update_nonexistent_job(repository, sample_job):
     """Test updating a non-existent job raises an error."""
     with pytest.raises(ValueError, match="Job with id .* does not exist."):
-        repository.update(sample_job)
+        repository.update(sample_job.id, {})
 
 
 def test_delete_job(repository, sample_job):

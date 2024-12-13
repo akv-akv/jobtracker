@@ -19,10 +19,13 @@ class InMemoryJobRepository(JobRepository):
     def read(self, job_id: UUID) -> Optional[Job]:
         return self.jobs.get(job_id)
 
-    def update(self, job: Job) -> None:
-        if job.id not in self.jobs:
-            raise ValueError(f"Job with id {job.id} does not exist.")
-        self.jobs[job.id] = job
+    def update(self, job_id, data) -> None:
+        if job_id not in self.jobs:
+            raise ValueError(f"Job with id {job_id} does not exist.")
+        job = self.jobs[job_id]
+        for key, value in data.items():
+            if hasattr(job, key):
+                setattr(job, key, value)
 
     def delete(self, job_id: UUID) -> None:
         if job_id not in self.jobs:

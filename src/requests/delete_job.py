@@ -17,8 +17,11 @@ class DeleteJobInvalidRequest(InvalidRequest):
 def build_delete_job_request(id: UUID):
     """Factory for creating AddJobRequest."""
     if not isinstance(id, UUID):
-        invalid_req = DeleteJobInvalidRequest()
-        invalid_req.add_error("id", "Must be UUID.")
-        return invalid_req
+        try:
+            id = UUID(id)
+        except Exception:
+            invalid_req = DeleteJobInvalidRequest()
+            invalid_req.add_error("id", "Must be UUID.")
+            return invalid_req
 
     return DeleteJobValidRequest(id)
