@@ -56,11 +56,15 @@ python_version = 3.13
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=term-missing --hypothesis-show-statistics"
+addopts = "--cov=src --cov-report=term-missing"
 testpaths = ["tests"]
+python_files = "test*.py"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning"
+]
+markers = [
+    "integration: integration tests"
 ]
 
 [tool.hypothesis]

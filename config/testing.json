@@ -1,0 +1,26 @@
+[
+  {
+    "name": "POSTGRES_DB",
+    "value": "postgres"
+  },
+  {
+    "name": "POSTGRES_USER",
+    "value": "postgres"
+  },
+  {
+    "name": "POSTGRES_HOSTNAME",
+    "value": "localhost"
+  },
+  {
+    "name": "POSTGRES_PORT",
+    "value": "5434"
+  },
+  {
+    "name": "POSTGRES_PASSWORD",
+    "value": "postgres"
+  },
+  {
+    "name": "APPLICATION_DB",
+    "value": "test"
+  }
+]
