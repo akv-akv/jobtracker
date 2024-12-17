@@ -1,0 +1,175 @@
+application:
+  stack:
+    - python
+    - postgres
+    - fastAPI
+    - FastHTML
+  initial_ideas:
+    core_purposes:
+      - Job Management:
+          - Help users manage job openings
+          - Analyze job openings
+      - Resume Management:
+          - Help users manage resumes
+      - Application Assistant:
+          - Help users create valuable cover letters
+          - Track job applications
+      - Reporting:
+          - Generate reporting for users
+          - Generate reporting for administrators
+    functionality:
+      user_facing:
+        - Login Management / Passwords
+        - Job Management
+        - Resume Management
+        - Cover Letter Management
+        - Job Application Management
+        - Resume Template Management
+        - User Reporting
+      admin_facing:
+        - User Management
+        - System Reporting
+        - Resume Template Management
+        - Cover Letter Template Management
+      shared:
+        - LLM Integration
+        - Notification Management
+    external_systems:
+      - Google chrome script to create jobs from different websites (last one to implement)
+      - LLM (OpenAI)
+      - database:
+          primary: Postgres
+          alternatives:
+            - SQLite (for local/testing)
+      - notification_service: Email or messaging provider
+    scalability_requirements:
+      - Handle concurrent users efficiently (100 for MVP, scalable to 10k+)
+      - Modular architecture for adding new features
+      - Asynchronous processing for LLM operations
+      - Cloud-friendly deployment for easy scaling
+    business_entities:
+      - User:
+          fields:
+            - id: UUID
+            - email: string
+            - password_hash: string
+            - created_at: datetime
+      - Job:
+          fields:
+            - id: UUID
+            - title: string
+            - company: string
+            - description: text
+            - user_id: UUID (foreign key to User.id)
+            - created_at: datetime
+      - Skill:
+          fields:
+            - id: UUID
+            - name: string
+            - user_id: UUID (foreign key to User.id)
+      - SkillHistory:
+          fields:
+            - id: UUID
+            - name: string
+            - skill_id: UUID (foreign key to Skill.id)
+      - Resume:
+          fields:
+            - id: UUID
+            - name: string
+            - user_id: UUID (foreign key to User.id)
+            - template_id: UUID (foreign key to ResumeTemplate.id)
+            - created_at: datetime
+      - ResumeTemplate:
+          fields:
+            - id: UUID
+            - name: string
+            - layout_data: string (e.g., LaTeX template content)
+      - ResumeVersion:
+          fields:
+            - id: UUID
+            - resume_id: UUID (foreign key to Resume.id)
+            - content: text/JSON
+            - created_at: datetime
+      - CoverLetter:
+          fields:
+            - id: UUID
+            - job_id: UUID (foreign key to Job.id)
+            - user_id: UUID (foreign key to User.id)
+            - content: text/JSON
+            - created_at: datetime
+            - template_id: UUID (foreign key to CoverLetterTemplate.id)
+      - CoverLetterTemplate:
+          fields:
+            - id: UUID
+            - name: string
+            - layout_data: JSON
+      - JobApplication:
+          fields:
+            - id: UUID
+            - user_id: UUID (foreign key to User.id)
+            - job_id: UUID (foreign key to Job.id)
+            - resume_id: UUID (foreign key to Resume.id)
+            - status: enum(applied, interview, rejected, etc.)
+            - created_at: datetime
+      - JobAnalysis:
+          fields:
+            - id: UUID
+            - job_id: UUID (foreign key to Job.id)
+            - analysis_result: JSON
+            - created_at: datetime
+    use_cases:
+      user_management:
+        - register user
+        - user login
+        - change password
+      job_management:
+        - add_job
+        - delete_job
+        - update_job
+        - list_jobs
+      template_management:
+        - add_resume_template
+        - update_resume_template
+        - delete_resume_template
+        - list_resume_templates
+        - add_cover_letter_template
+        - update_cover_letter_template
+        - delete_cover_letter_template
+        - list_cover_letter_templates
+      resume_management:
+        - add_resume_main_info
+        - update (creates a new version)
+        - delete
+        - get_latest
+        - add_work_experience
+        - update (creates a new version)
+        - delete
+        - get_latest
+        - create-resume-version
+        - delete-resume-version
+        - generate-pdf
+      job_analyser:
+        - analyse_job_success_chances (given skillhistory, resumeversion, job)
+        - generate_cover_letter (for job, resumeversion)
+  implementation_phases:
+    - phase_1:
+      goal:
+        - Phase 1 architecture diagram
+        - User entity (tested)
+        - User use_cases (tested)
+        - User repo memory
+        - Job entity (tested)
+        - Job use_cases (tested)
+        - Job repo postgres
+        - Requests
+        - Responses
+        - REST API
+        - Frontend MVP
+        - Web application that has user management, and job management functionality
+      done:
+        -
+    - phase_2
+    - phase_3
+    - phase_4
+    - phase_5
+    - phase_6
