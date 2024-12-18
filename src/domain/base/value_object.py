@@ -25,7 +25,7 @@ class ValueObject:
             if field_name in annotations and not isinstance(
                 field_value, annotations[field_name]
             ):
-                raise ValidationError(
+                raise TypeError(
                     f"Invalid type for field '{field_name}': "
                     f"Expected {annotations[field_name]}, got {type(field_value)}"
                 )
@@ -35,11 +35,8 @@ class ValueObject:
         """
         Factory method to create a ValueObject
         """
-        try:
-            cls._validate_types(values)
-            return cls(**values)
-        except TypeError as e:
-            raise ValidationError(f"Invalid fields or missing arguments: {e}") from e
+        cls._validate_types(values)
+        return cls(**values)
 
     def update(self: T, **values: Dict[str, Any]) -> T:
         """
@@ -47,6 +44,8 @@ class ValueObject:
         """
         if not values:  # No updates provided
             return self
-
         self._validate_types(values)
         return replace(self, **values)
+
+    def __hash__(self):
+        return hash(self.__class__) + hash(tuple(self.__dict__.values()))

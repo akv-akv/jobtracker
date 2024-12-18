@@ -15,7 +15,7 @@ def now():
     return datetime.now(timezone.utc)
 
 
-@dataclass
+@dataclass(frozen=True)
 class RootEntity(ValueObject):
     """
     Types that have an identity.
@@ -39,6 +39,7 @@ class RootEntity(ValueObject):
             values["id"] = uuid.uuid4()
         values.setdefault("created_at", now())
         values.setdefault("updated_at", values["created_at"])
+        cls._validate_types(values)
         return cls(**values)
 
     def update(self: T, **values) -> T:
@@ -48,7 +49,10 @@ class RootEntity(ValueObject):
         """
         if "id" in values and self.id is not None and values["id"] != self.id:
             raise Exception("Cannot change the id of an entity")
+        if "created_at" in values:
+            raise Exception("Cannot change the created_at timestamp")
         values.setdefault("updated_at", now())
+        self._validate_types(values)
         return replace(self, **values)
 
     def __hash__(self):
