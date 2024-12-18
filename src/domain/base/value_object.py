@@ -1,4 +1,4 @@
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from typing import Any, Dict, TypeVar, get_type_hints
 
 # Generic type variables
@@ -46,6 +46,9 @@ class ValueObject:
             return self
         self._validate_types(values)
         return replace(self, **values)
+
+    def to_dict(self: T):
+        return asdict(self)
 
     def __hash__(self):
         return hash(self.__class__) + hash(tuple(self.__dict__.values()))
