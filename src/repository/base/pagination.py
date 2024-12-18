@@ -11,7 +11,7 @@ class PageOptions:
     limit: int
     offset: int = 0
     order_by: str = "created_at"
-    ascending: bool = False
+    ascending: bool = True
     cursor: datetime | None = None
 
 

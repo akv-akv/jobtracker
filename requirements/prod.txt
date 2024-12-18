@@ -1,4 +1,5 @@
 alembic
+inject
 psycopg2-binary
 SQLAlchemy
 typer

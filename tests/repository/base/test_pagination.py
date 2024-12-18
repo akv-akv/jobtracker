@@ -35,7 +35,7 @@ def test_page_options_defaults():
     assert options.limit == 10
     assert options.offset == 0
     assert options.order_by == "created_at"
-    assert options.ascending is False
+    assert options.ascending is True
     assert options.cursor is None
 
 

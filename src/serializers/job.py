@@ -13,14 +13,14 @@ class JobJsonEncoder(JSONEncoder):
                 "title": o.title,
                 "company": o.company,
                 "status": o.status.name,
-                "country": o.country,
+                "country": o.country.value,
                 "city": o.city,
                 "description": o.description,
                 "notes": o.notes,
                 "external_id": o.external_id,
                 "platform": o.platform,
-                "date_applied": o.date_applied.isoformat(),
-                "date_updated": o.date_updated.isoformat(),
+                "created_at": o.created_at.isoformat(),
+                "updated_at": o.updated_at.isoformat(),
             }
         # Default fallback
         return super().default(o)

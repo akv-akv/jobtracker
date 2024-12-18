@@ -61,6 +61,8 @@ identify==2.6.3
     # via pre-commit
 iniconfig==2.0.0
     # via pytest
+inject==5.2.1
+    # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 ipython==8.30.0
     # via -r requirements/dev.in
 isort==5.13.2

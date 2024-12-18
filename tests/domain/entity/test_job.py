@@ -13,7 +13,6 @@ def user_strategy(draw):
     """Hypothesis strategy to generate User instances."""
     return User.create(
         name=draw(st.text(min_size=1, max_size=50)),
-        email=draw(st.text(min_size=5, max_size=100)),
     )
 
 
