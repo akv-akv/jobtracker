@@ -138,9 +138,12 @@ pyrepl==0.9.0
 pytest==8.3.4
     # via
     #   -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
+    #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
     #   pytest-xdist
+pytest-asyncio==0.25.0
+    # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-cov==6.0.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-mock==3.14.0

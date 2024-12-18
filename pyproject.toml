@@ -59,6 +59,7 @@ ignore_missing_imports = true
 addopts = "--cov=src --cov-report=term-missing"
 testpaths = ["tests"]
 python_files = "test*.py"
+asyncio_mode = "auto"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning"
