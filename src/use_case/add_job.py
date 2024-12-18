@@ -1,10 +1,10 @@
 from src.domain.entity.job import Job
-from src.repository.job_base import JobRepository
+from src.repository.base.repository import Repository
 from src.requests.add_job import AddJobInvalidRequest, build_add_job_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 
-def add_job(data, repository: JobRepository):
+async def add_job(data, repository: Repository):
     """Use case for adding a job."""
     request = build_add_job_request(data)
 
@@ -12,8 +12,8 @@ def add_job(data, repository: JobRepository):
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
     try:
-        job = Job(**request.data)
-        repository.create(job)
+        job = Job.create(**request.data)
+        await repository.add(job)
         return ResponseSuccess(job)
     except ValueError as e:
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, str(e))

@@ -3,18 +3,26 @@ from uuid import uuid4
 
 import pytest
 
-from src.domain.entity.job import JobStatus
-from src.repository.job_memory import InMemoryJobRepository
+from src.domain.entity.job import Job, JobStatus
+from src.repository.base.repository import Repository
+from src.repository.in_memory_gateway import InMemoryGateway
 from src.responses.response import ResponseTypes
 from src.use_case.add_job import add_job
 
 
+class JobRepository(Repository[Job]):
+    pass
+
+
 @pytest.fixture
 def repository():
-    return InMemoryJobRepository()
+    gateway = InMemoryGateway([])
+
+    repository = JobRepository(gateway)
+    return repository
 
 
-def test_add_job_success(repository):
+async def test_add_job_success(repository):
     """Test adding a job successfully."""
     data = {
         "id": uuid4(),
@@ -24,11 +32,9 @@ def test_add_job_success(repository):
         "country": "USA",
         "city": "NY",
         "description": "A challenging job opportunity.",
-        "date_applied": datetime(2023, 1, 10),
-        "date_updated": datetime(2023, 1, 10),
     }
     response = add_job(data, repository)
-    added_job = repository.read(data["id"])
+    added_job = repository.get(data["id"])
 
     assert response.type == ResponseTypes.SUCCESS
     assert added_job.title == "Software Engineer"

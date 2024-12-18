@@ -17,7 +17,7 @@ def test_job_serializer(job):
     assert job_dict["status"] == job.status.name
     assert job_dict["title"] == job.title
     assert job_dict["company"] == job.company
-    assert job_dict["country"] == job.country
+    assert job_dict["country"] == job.country.value
     assert job_dict["city"] == job.city
     assert job_dict["description"] == job.description
     assert job_dict["notes"] == job.notes
