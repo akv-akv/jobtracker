@@ -18,7 +18,7 @@ class SQLProvider:
     ) -> list[Dict[str, Any]]:
         async with self.connection.begin():
             result = await self.connection.execute(query, bind_params or {})
-            rows = result.fetchall()  # Await the coroutine to fetch the results
+            rows = await result.fetchall()  # type: ignore
             return [dict(row) for row in rows]
 
     @asynccontextmanager
