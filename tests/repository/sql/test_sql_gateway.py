@@ -68,11 +68,11 @@ def assert_query_equal(q: Executable, expected: str, literal_binds: bool = True)
     assert actual == expected, actual
 
 
-writer = Table(
-    "writer",
+author = Table(
+    "author",
     MetaData(),
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("value", Text, nullable=False),
+    Column("name", Text, nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
 )
 
@@ -83,19 +83,19 @@ book = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("title", Text, nullable=False),
     Column(
-        "writer_id",
+        "author_id",
         Integer,
-        ForeignKey("writer.id", ondelete="CASCADE", name="book_writer_id_fkey"),
+        ForeignKey("author.id", ondelete="CASCADE", name="book_author_id_fkey"),
         nullable=False,
     ),
 )
 
 
-ALL_FIELDS = "writer.id, writer.value, writer.updated_at"
-BOOK_FIELDS = "book.id, book.title, book.writer_id"
+ALL_FIELDS = "author.id, author.value, author.updated_at"
+BOOK_FIELDS = "book.id, book.title, book.author_id"
 
 
-class TstSQLGateway(SQLGateway, table=writer):
+class TstSQLGateway(SQLGateway, table=author):
     pass
 
 
@@ -118,15 +118,15 @@ def related_sql_gateway():
     [
         ([], " WHERE true"),
         ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE writer.value = 'foo'"),
+        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
         (
             [Filter(field="value", values=["foo", "bar"])],
-            " WHERE writer.value IN ('foo', 'bar')",
+            " WHERE author.value IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
             [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE writer.id = 1 AND writer.value = 'foo'",
+            " WHERE author.id = 1 AND author.value = 'foo'",
         ),
     ],
 )
@@ -136,7 +136,7 @@ async def test_filter(sql_gateway, filters, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        f"SELECT {ALL_FIELDS} FROM writer{sql}",
+        f"SELECT {ALL_FIELDS} FROM author{sql}",
     )
 
 
@@ -146,11 +146,11 @@ async def test_filter(sql_gateway, filters, sql):
         (None, ""),
         (
             PageOptions(limit=5, order_by="id"),
-            " ORDER BY writer.id ASC LIMIT 5 OFFSET 0",
+            " ORDER BY author.id ASC LIMIT 5 OFFSET 0",
         ),
         (
             PageOptions(limit=5, offset=2, order_by="id", ascending=False),
-            " ORDER BY writer.id DESC LIMIT 5 OFFSET 2",
+            " ORDER BY author.id DESC LIMIT 5 OFFSET 2",
         ),
     ],
 )
@@ -162,7 +162,7 @@ async def test_filter_with_pagination(sql_gateway, page_options, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        f"SELECT {ALL_FIELDS} FROM writer WHERE true{sql}",
+        f"SELECT {ALL_FIELDS} FROM author WHERE true{sql}",
     )
 
 
@@ -176,9 +176,9 @@ async def test_filter_with_pagination_and_filter(sql_gateway):
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
         (
-            f"SELECT {ALL_FIELDS} FROM writer "
-            f"WHERE writer.value = 'foo' "
-            f"ORDER BY writer.id ASC LIMIT 5 OFFSET 0"
+            f"SELECT {ALL_FIELDS} FROM author "
+            f"WHERE author.value = 'foo' "
+            f"ORDER BY author.id ASC LIMIT 5 OFFSET 0"
         ),
     )
 
@@ -188,15 +188,15 @@ async def test_filter_with_pagination_and_filter(sql_gateway):
     [
         ([], " WHERE true"),
         ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE writer.value = 'foo'"),
+        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
         (
             [Filter(field="value", values=["foo", "bar"])],
-            " WHERE writer.value IN ('foo', 'bar')",
+            " WHERE author.value IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
             [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE writer.id = 1 AND writer.value = 'foo'",
+            " WHERE author.id = 1 AND author.value = 'foo'",
         ),
     ],
 )
@@ -206,7 +206,7 @@ async def test_count(sql_gateway, filters, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        f"SELECT count(*) AS count FROM writer{sql}",
+        f"SELECT count(*) AS count FROM author{sql}",
     )
 
 
@@ -243,7 +243,7 @@ async def test_add(sql_gateway, record, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        (f"INSERT INTO writer {sql} RETURNING {ALL_FIELDS}"),
+        (f"INSERT INTO author {sql} RETURNING {ALL_FIELDS}"),
     )
 
 
@@ -253,15 +253,15 @@ async def test_add(sql_gateway, record, sql):
         (
             {"id": 2, "value": "foo"},
             None,
-            "SET id=2, value='foo' WHERE writer.id = 2",
+            "SET id=2, value='foo' WHERE author.id = 2",
         ),
-        ({"id": 2, "other": "foo"}, None, "SET id=2 WHERE writer.id = 2"),
+        ({"id": 2, "other": "foo"}, None, "SET id=2 WHERE author.id = 2"),
         (
             {"id": 2, "value": "foo"},
             datetime(2010, 1, 1, tzinfo=timezone.utc),
             (
-                "SET id=2, value='foo' WHERE writer.id = 2 "
-                "AND writer.updated_at = '2010-01-01 00:00:00+00:00'"
+                "SET id=2, value='foo' WHERE author.id = 2 "
+                "AND author.updated_at = '2010-01-01 00:00:00+00:00'"
             ),
         ),
     ],
@@ -273,7 +273,7 @@ async def test_update(sql_gateway, record, if_unmodified_since, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        (f"UPDATE writer {sql} RETURNING {ALL_FIELDS}"),
+        (f"UPDATE author {sql} RETURNING {ALL_FIELDS}"),
     )
 
 
@@ -314,7 +314,7 @@ async def test_remove(sql_gateway):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        ("DELETE FROM writer WHERE writer.id = 2 RETURNING writer.id"),
+        ("DELETE FROM author WHERE author.id = 2 RETURNING author.id"),
     )
 
 
@@ -324,7 +324,7 @@ async def test_remove_does_not_exist(sql_gateway):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        ("DELETE FROM writer WHERE writer.id = 2 RETURNING writer.id"),
+        ("DELETE FROM author WHERE author.id = 2 RETURNING author.id"),
     )
 
 
@@ -336,7 +336,7 @@ async def test_upsert(sql_gateway):
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
         (
-            f"INSERT INTO writer (id, value) VALUES (2, 'foo') "
+            f"INSERT INTO author (id, value) VALUES (2, 'foo') "
             f"ON CONFLICT (id) DO UPDATE SET "
             f"id = %(param_1)s, value = %(param_2)s "
             f"RETURNING {ALL_FIELDS}"
@@ -354,25 +354,25 @@ async def test_upsert_no_id(add_m, sql_gateway):
 
 
 async def test_get_related_one_to_many(related_sql_gateway: SQLGateway):
-    writers = [{"id": 2}, {"id": 3}]
+    authors = [{"id": 2}, {"id": 3}]
     books = [
-        {"id": 3, "title": "x", "writer_id": 2},
-        {"id": 4, "title": "y", "writer_id": 2},
+        {"id": 3, "title": "x", "author_id": 2},
+        {"id": 4, "title": "y", "author_id": 2},
     ]
     related_sql_gateway.provider.result.return_value = books
     await related_sql_gateway._get_related_one_to_many(
-        items=writers,
+        items=authors,
         field_name="books",
-        fk_name="writer_id",
+        fk_name="author_id",
     )
 
-    assert writers == [{"id": 2, "books": books}, {"id": 3, "books": []}]
+    assert authors == [{"id": 2, "books": books}, {"id": 3, "books": []}]
     assert len(related_sql_gateway.provider.queries) == 1
     assert_query_equal(
         related_sql_gateway.provider.queries[0][0],
         (
-            "SELECT book.id, book.title, book.writer_id "
-            "FROM book WHERE book.writer_id IN (2, 3)"
+            "SELECT book.id, book.title, book.author_id "
+            "FROM book WHERE book.author_id IN (2, 3)"
         ),
     )
 
@@ -382,51 +382,51 @@ async def test_get_related_one_to_many(related_sql_gateway: SQLGateway):
     [
         # no change
         (
-            [{"id": 3, "title": "x", "writer_id": 2}],
-            [{"id": 3, "title": "x", "writer_id": 2}],
+            [{"id": 3, "title": "x", "author_id": 2}],
+            [{"id": 3, "title": "x", "author_id": 2}],
             [],
             [],
         ),
         # added a book (without an id)
         (
-            [{"title": "x", "writer_id": 2}],
+            [{"title": "x", "author_id": 2}],
             [],
             [
-                "INSERT INTO book (title, writer_id) VALUES ('x', 2) "
+                "INSERT INTO book (title, author_id) VALUES ('x', 2) "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "writer_id": 2}]],
+            [[{"id": 3, "title": "x", "author_id": 2}]],
         ),
         # added a book (with an id)
         (
-            [{"id": 3, "title": "x", "writer_id": 2}],
+            [{"id": 3, "title": "x", "author_id": 2}],
             [],
             [
-                "INSERT INTO book (id, title, writer_id) VALUES (3, 'x', 2) "
+                "INSERT INTO book (id, title, author_id) VALUES (3, 'x', 2) "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "writer_id": 2}]],
+            [[{"id": 3, "title": "x", "author_id": 2}]],
         ),
         # updated a book
         (
-            [{"id": 3, "title": "x", "writer_id": 2}],
-            [{"id": 3, "title": "a", "writer_id": 2}],
+            [{"id": 3, "title": "x", "author_id": 2}],
+            [{"id": 3, "title": "a", "author_id": 2}],
             [
-                "UPDATE book SET id=3, title='x', writer_id=2 WHERE book.id = 3 "
+                "UPDATE book SET id=3, title='x', author_id=2 WHERE book.id = 3 "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "writer_id": 2}]],
+            [[{"id": 3, "title": "x", "author_id": 2}]],
         ),
         # replaced a book with a new one
         (
-            [{"title": "x", "writer_id": 2}],
-            [{"id": 15, "title": "a", "writer_id": 2}],
+            [{"title": "x", "author_id": 2}],
+            [{"id": 15, "title": "a", "author_id": 2}],
             [
-                "INSERT INTO book (title, writer_id) VALUES ('x', 2) "
+                "INSERT INTO book (title, author_id) VALUES ('x', 2) "
                 f"RETURNING {BOOK_FIELDS}",
                 "DELETE FROM book WHERE book.id = 15 RETURNING book.id",
             ],
-            [[{"id": 3, "title": "x", "writer_id": 2}], [{"id": 15}]],
+            [[{"id": 3, "title": "x", "author_id": 2}], [{"id": 15}]],
         ),
     ],
 )
@@ -437,24 +437,24 @@ async def test_set_related_one_to_many(
     expected_queries,
     query_results,
 ):
-    writer = {"id": 2, "books": books}
+    author = {"id": 2, "books": books}
     related_sql_gateway.provider.result.side_effect = [current_books] + query_results
-    result = writer.copy()
+    result = author.copy()
     await related_sql_gateway._set_related_one_to_many(
-        item=writer,
+        item=author,
         result=result,
         field_name="books",
-        fk_name="writer_id",
+        fk_name="author_id",
     )
 
     assert result == {
         "id": 2,
-        "books": [{"id": 3, "title": "x", "writer_id": 2}],
+        "books": [{"id": 3, "title": "x", "author_id": 2}],
     }
     assert len(related_sql_gateway.provider.queries) == len(expected_queries) + 1
     assert_query_equal(
         related_sql_gateway.provider.queries[0][0],
-        f"SELECT {BOOK_FIELDS} FROM book WHERE book.writer_id = 2",
+        f"SELECT {BOOK_FIELDS} FROM book WHERE book.author_id = 2",
     )
     for (actual_query,), expected_query in zip(
         related_sql_gateway.provider.queries[1:], expected_queries
@@ -475,12 +475,12 @@ async def test_update_transactional(sql_gateway):
     assert len(queries) == 2
     assert_query_equal(
         queries[0],
-        f"SELECT {ALL_FIELDS} FROM writer WHERE writer.id = 2 FOR UPDATE",
+        f"SELECT {ALL_FIELDS} FROM author WHERE author.id = 2 FOR UPDATE",
     )
     assert_query_equal(
         queries[1],
         (
-            "UPDATE writer SET id=2, value='bar' WHERE writer.id = 2 "
+            "UPDATE author SET id=2, value='bar' WHERE author.id = 2 "
             f"RETURNING {ALL_FIELDS}"
         ),
     )
@@ -491,15 +491,15 @@ async def test_update_transactional(sql_gateway):
     [
         ([], " WHERE true"),
         ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE writer.value = 'foo'"),
+        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
         (
             [Filter(field="value", values=["foo", "bar"])],
-            " WHERE writer.value IN ('foo', 'bar')",
+            " WHERE author.value IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
             [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE writer.id = 1 AND writer.value = 'foo'",
+            " WHERE author.id = 1 AND author.value = 'foo'",
         ),
     ],
 )
@@ -509,5 +509,5 @@ async def test_exists(sql_gateway, filters, sql):
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
-        f"SELECT true AS exists FROM writer{sql} LIMIT 1",
+        f"SELECT true AS exists FROM author{sql} LIMIT 1",
     )

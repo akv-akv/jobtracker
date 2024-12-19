@@ -36,7 +36,7 @@ class Job(RootEntity):
     description: str
     country: Country
     city: str
-    remote_type: Optional[WorkSettingType]
+    work_setting_type: Optional[WorkSettingType]
     status: JobStatus = JobStatus.ADDED
     employment_type: Optional[EmploymentType] = EmploymentType.FULLTIME
     notes: Optional[str] = None

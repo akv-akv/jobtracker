@@ -22,20 +22,21 @@ def build_add_job_request(data: Dict[str, Any]):
         return invalid_req
 
     required_fields = [
-        "id",
+        "user",
         "title",
         "company",
-        "status",
+        "description",
         "country",
         "city",
-        "description",
+        "status",
+        "work_setting_type",
     ]
     invalid_req = AddJobInvalidRequest()
 
+    # Validate required fields
     for field in required_fields:
         if field not in data:
             invalid_req.add_error(field, f"'{field}' is required.")
-
     if invalid_req.has_errors():
         return invalid_req
 

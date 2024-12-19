@@ -10,7 +10,7 @@ from src.domain.base.root_entity import RootEntity
 from src.repository.base.filter import Filter
 from src.repository.base.pagination import Page, PageOptions
 from src.repository.base.repository import Repository
-from src.repository.in_memory_gateway import InMemoryGateway
+from src.repository.in_memory.in_memory_gateway import InMemoryGateway
 
 
 @dataclass(frozen=True)
