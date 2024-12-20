@@ -22,7 +22,7 @@ def test_build_add_job_request_complete_data():
         "title": "Data engineer",
         "company": "Awesome Employer",
         "description": "Test description",
-        "country": Country.US,
+        "country": Country.UnitedStates,
         "city": "NYC",
         "status": JobStatus.ADDED,
         "work_setting_type": WorkSettingType.HYBRID,

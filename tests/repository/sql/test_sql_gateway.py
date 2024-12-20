@@ -1,15 +1,26 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from enum import Enum as PyEnum
 from typing import Any, AsyncIterator
 from unittest import mock
 
 import pytest
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, MetaData, Table, Text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    MetaData,
+    Table,
+    Text,
+)
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import Executable
 
 from src.domain.base.exceptions import Conflict, DoesNotExist
 from src.repository.base.filter import Filter
+from src.repository.base.mapper import Mapper
 from src.repository.base.pagination import PageOptions
 from src.repository.sql.sql_gateway import SQLGateway
 from src.repository.sql.sql_provider import SQLProvider
@@ -68,6 +79,12 @@ def assert_query_equal(q: Executable, expected: str, literal_binds: bool = True)
     assert actual == expected, actual
 
 
+class MyEnum(PyEnum):
+    one = "one"
+    two = "two"
+    three = "three"
+
+
 author = Table(
     "author",
     MetaData(),
@@ -82,6 +99,7 @@ book = Table(
     MetaData(),
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("title", Text, nullable=False),
+    Column("book_type", Enum(MyEnum, name="myenum")),
     Column(
         "author_id",
         Integer,
@@ -91,8 +109,26 @@ book = Table(
 )
 
 
+class BookMapper(Mapper):
+    def to_external(self, internal):
+        return {
+            "id": internal.get("id"),
+            "title": internal.get("title"),
+            "book_type": internal.get("book_type"),
+            "author_id": internal.get("author_id"),
+        }
+
+    # def to_internal(self, external):
+    #     return {
+    #         "id": external["id"],
+    #         "title": external["title"],
+    #         "book_type": external["book_type"],
+    #         "author_id": external["author_id"],
+    #     }
+
+
 ALL_FIELDS = "author.id, author.name, author.updated_at"
-BOOK_FIELDS = "book.id, book.title, book.author_id"
+BOOK_FIELDS = "book.id, book.title, book.book_type, book.author_id"
 
 
 class TstSQLGateway(SQLGateway, table=author):
@@ -100,7 +136,7 @@ class TstSQLGateway(SQLGateway, table=author):
 
 
 class TstRelatedSQLGateway(SQLGateway, table=book):
-    pass
+    mapper = BookMapper()
 
 
 @pytest.fixture
@@ -207,6 +243,16 @@ async def test_count(sql_gateway, filters, sql):
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
         f"SELECT count(*) AS count FROM author{sql}",
+    )
+
+
+async def test_count_related_gateway(related_sql_gateway):
+    related_sql_gateway.provider.result.return_value = [{"count": 4}]
+    assert await related_sql_gateway.count([]) == 4
+    assert len(related_sql_gateway.provider.queries) == 1
+    assert_query_equal(
+        related_sql_gateway.provider.queries[0][0],
+        "SELECT count(*) AS count FROM book WHERE true",
     )
 
 
@@ -356,8 +402,8 @@ async def test_upsert_no_id(add_m, sql_gateway):
 async def test_get_related_one_to_many(related_sql_gateway: SQLGateway):
     authors = [{"id": 2}, {"id": 3}]
     books = [
-        {"id": 3, "title": "x", "author_id": 2},
-        {"id": 4, "title": "y", "author_id": 2},
+        {"id": 3, "title": "x", "book_type": "one", "author_id": 2},
+        {"id": 4, "title": "y", "book_type": "two", "author_id": 2},
     ]
     related_sql_gateway.provider.result.return_value = books
     await related_sql_gateway._get_related_one_to_many(
@@ -371,7 +417,7 @@ async def test_get_related_one_to_many(related_sql_gateway: SQLGateway):
     assert_query_equal(
         related_sql_gateway.provider.queries[0][0],
         (
-            "SELECT book.id, book.title, book.author_id "
+            "SELECT book.id, book.title, book.book_type, book.author_id "
             "FROM book WHERE book.author_id IN (2, 3)"
         ),
     )
@@ -382,51 +428,56 @@ async def test_get_related_one_to_many(related_sql_gateway: SQLGateway):
     [
         # no change
         (
-            [{"id": 3, "title": "x", "author_id": 2}],
-            [{"id": 3, "title": "x", "author_id": 2}],
+            [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
+            [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
             [],
             [],
         ),
         # added a book (without an id)
         (
-            [{"title": "x", "author_id": 2}],
+            [{"title": "x", "book_type": "one", "author_id": 2}],
             [],
             [
-                "INSERT INTO book (title, author_id) VALUES ('x', 2) "
+                "INSERT INTO book (title, book_type, author_id) VALUES ('x', 'one', 2) "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "author_id": 2}]],
+            [[{"id": 3, "title": "x", "book_type": "one", "author_id": 2}]],
         ),
         # added a book (with an id)
         (
-            [{"id": 3, "title": "x", "author_id": 2}],
+            [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
             [],
             [
-                "INSERT INTO book (id, title, author_id) VALUES (3, 'x', 2) "
+                "INSERT INTO book (id, title, book_type, "
+                "author_id) VALUES (3, 'x', 'one', 2) "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "author_id": 2}]],
+            [[{"id": 3, "title": "x", "book_type": "one", "author_id": 2}]],
         ),
         # updated a book
         (
-            [{"id": 3, "title": "x", "author_id": 2}],
-            [{"id": 3, "title": "a", "author_id": 2}],
+            [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
+            [{"id": 3, "title": "a", "book_type": "one", "author_id": 2}],
             [
-                "UPDATE book SET id=3, title='x', author_id=2 WHERE book.id = 3 "
+                "UPDATE book SET id=3, title='x', book_type='one', "
+                "author_id=2 WHERE book.id = 3 "
                 f"RETURNING {BOOK_FIELDS}"
             ],
-            [[{"id": 3, "title": "x", "author_id": 2}]],
+            [[{"id": 3, "title": "x", "book_type": "one", "author_id": 2}]],
         ),
         # replaced a book with a new one
         (
-            [{"title": "x", "author_id": 2}],
-            [{"id": 15, "title": "a", "author_id": 2}],
+            [{"title": "x", "book_type": "one", "author_id": 2}],
+            [{"id": 15, "title": "a", "book_type": "one", "author_id": 2}],
             [
-                "INSERT INTO book (title, author_id) VALUES ('x', 2) "
+                "INSERT INTO book (title, book_type, author_id) VALUES ('x', 'one', 2) "
                 f"RETURNING {BOOK_FIELDS}",
                 "DELETE FROM book WHERE book.id = 15 RETURNING book.id",
             ],
-            [[{"id": 3, "title": "x", "author_id": 2}], [{"id": 15}]],
+            [
+                [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
+                [{"id": 15}],
+            ],
         ),
     ],
 )
@@ -449,7 +500,7 @@ async def test_set_related_one_to_many(
 
     assert result == {
         "id": 2,
-        "books": [{"id": 3, "title": "x", "author_id": 2}],
+        "books": [{"id": 3, "title": "x", "book_type": "one", "author_id": 2}],
     }
     assert len(related_sql_gateway.provider.queries) == len(expected_queries) + 1
     assert_query_equal(
