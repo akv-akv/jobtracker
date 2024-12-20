@@ -5,14 +5,12 @@ import pytest
 from src.domain.entity.job import JobStatus, WorkSettingType
 from src.domain.entity.user import User
 from src.domain.enums.country import Country
-from src.repository.base.repository import Repository
-from src.repository.in_memory.in_memory_gateway import InMemoryGateway
 from src.responses.response import ResponseTypes
 from src.use_case.list_jobs import list_jobs
 
 
 @pytest.fixture
-async def repository_with_jobs(repository):
+async def job_manager_with_jobs(job_manager):
     """Fixture to populate the repository with sample jobs."""
     jobs = [
         {
@@ -21,7 +19,7 @@ async def repository_with_jobs(repository):
             "title": "Software Engineer",
             "company": "TechCorp",
             "status": JobStatus.APPLIED,
-            "country": Country.US,
+            "country": Country.UnitedStates,
             "work_setting_type": WorkSettingType.ONSITE,
             "city": "NY",
             "description": "A challenging job opportunity.",
@@ -32,7 +30,7 @@ async def repository_with_jobs(repository):
             "title": "Product Manager",
             "company": "BizCorp",
             "status": JobStatus.INTERVIEWING,
-            "country": Country.US,
+            "country": Country.UnitedStates,
             "work_setting_type": WorkSettingType.ONSITE,
             "city": "NY",
             "description": "A challenging job opportunity.",
@@ -43,21 +41,21 @@ async def repository_with_jobs(repository):
             "title": "Data Scientist",
             "company": "DataCorp",
             "status": JobStatus.REJECTED,
-            "country": Country.CA,
+            "country": Country.Canada,
             "work_setting_type": WorkSettingType.ONSITE,
             "city": "NY",
             "description": "A challenging job opportunity.",
         },
     ]
     for job in jobs:
-        await repository.add(job)
-    return repository
+        await job_manager.create(job)
+    return job_manager
 
 
-async def test_list_jobs_success_without_filters(repository_with_jobs):
+async def test_list_jobs_success_without_filters(job_manager_with_jobs):
     """Test listing all jobs without filters."""
     response = await list_jobs(
-        filters=None, params=None, repository=repository_with_jobs
+        filters=None, params=None, job_manager=job_manager_with_jobs
     )
     assert response.type == ResponseTypes.SUCCESS
     assert response.value.total == 3
@@ -68,11 +66,11 @@ async def test_list_jobs_success_without_filters(repository_with_jobs):
     }
 
 
-async def test_list_jobs_success_with_limit(repository_with_jobs):
+async def test_list_jobs_success_with_limit(job_manager_with_jobs):
     """Test listing all jobs without filters."""
     params = {"limit": 1}
     response = await list_jobs(
-        filters=None, params=params, repository=repository_with_jobs
+        filters=None, params=params, job_manager=job_manager_with_jobs
     )
     assert response.type == ResponseTypes.SUCCESS
     assert response.value.total == 3
@@ -82,11 +80,11 @@ async def test_list_jobs_success_with_limit(repository_with_jobs):
     }
 
 
-async def test_list_jobs_success_with_limit_and_offset(repository_with_jobs):
+async def test_list_jobs_success_with_limit_and_offset(job_manager_with_jobs):
     """Test listing all jobs without filters."""
     params = {"limit": 1, "offset": 1}
     response = await list_jobs(
-        filters=None, params=params, repository=repository_with_jobs
+        filters=None, params=params, job_manager=job_manager_with_jobs
     )
     assert response.type == ResponseTypes.SUCCESS
     assert response.value.total == 3
@@ -105,11 +103,11 @@ async def test_list_jobs_success_with_limit_and_offset(repository_with_jobs):
     ],
 )
 async def test_list_jobs_with_status_filter(
-    repository_with_jobs, filters, expected_titles
+    job_manager_with_jobs, filters, expected_titles
 ):
     """Test listing jobs with a status filter."""
     response = await list_jobs(
-        filters=filters, params=None, repository=repository_with_jobs
+        filters=filters, params=None, job_manager=job_manager_with_jobs
     )
 
     assert response.type == ResponseTypes.SUCCESS
@@ -125,11 +123,11 @@ async def test_list_jobs_with_status_filter(
     ],
 )
 async def test_list_jobs_with_company_filter(
-    repository_with_jobs, filters, expected_titles
+    job_manager_with_jobs, filters, expected_titles
 ):
     """Test listing jobs with a company filter."""
     response = await list_jobs(
-        filters=filters, params=None, repository=repository_with_jobs
+        filters=filters, params=None, job_manager=job_manager_with_jobs
     )
 
     assert response.type == ResponseTypes.SUCCESS
@@ -139,15 +137,15 @@ async def test_list_jobs_with_company_filter(
 @pytest.mark.parametrize(
     "filters,expected_titles",
     [
-        ({"country": Country.US}, ["Software Engineer", "Product Manager"]),
-        ({"country": Country.CA}, ["Data Scientist"]),
+        ({"country": Country.UnitedStates}, ["Software Engineer", "Product Manager"]),
+        ({"country": Country.Canada}, ["Data Scientist"]),
     ],
 )
 async def test_list_jobs_with_country_filter(
-    repository_with_jobs, filters, expected_titles
+    job_manager_with_jobs, filters, expected_titles
 ):
     """Test listing jobs with a country filter."""
-    response = await list_jobs(filters=filters, repository=repository_with_jobs)
+    response = await list_jobs(filters=filters, job_manager=job_manager_with_jobs)
 
     assert response.type == ResponseTypes.SUCCESS
     assert {job.title for job in response.value.items} == set(expected_titles)
@@ -168,17 +166,17 @@ async def test_list_jobs_with_country_filter(
 #     repository_with_jobs, filters, expected_titles
 # ):
 #     """Test listing jobs with date filters."""
-#     response = await list_jobs(filters=filters, repository=repository_with_jobs)
+#     response = await list_jobs(filters=filters, job_manager=job_manager_with_jobs)
 
 #     assert response.value.items == ""
 #     assert response.type == ResponseTypes.SUCCESS
 #     assert {job.title for job in response.value.items} == set(expected_titles)
 
 
-async def test_list_jobs_with_invalid_filters(repository_with_jobs):
+async def test_list_jobs_with_invalid_filters(job_manager_with_jobs):
     """Test listing jobs with invalid filters."""
     filters = {"invalid_key": "value"}
-    response = await list_jobs(filters=filters, repository=repository_with_jobs)
+    response = await list_jobs(filters=filters, job_manager=job_manager_with_jobs)
 
     assert response.type == ResponseTypes.PARAMETERS_ERROR
     assert response.message == [
@@ -186,10 +184,9 @@ async def test_list_jobs_with_invalid_filters(repository_with_jobs):
     ]
 
 
-async def test_list_jobs_with_empty_repository():
+async def test_list_jobs_with_empty_repository(job_manager):
     """Test listing jobs when the repository is empty."""
-    repo = Repository(InMemoryGateway([]))  # Empty repository
-    response = await list_jobs(filters=None, repository=repo)
+    response = await list_jobs(filters=None, job_manager=job_manager)
 
     assert response.type == ResponseTypes.SUCCESS
     assert len(response.value.items) == 0
