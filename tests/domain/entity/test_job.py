@@ -32,7 +32,7 @@ def job_strategy(draw):
         description=draw(st.text(min_size=1, max_size=2500)),
         country=draw(country_strategy()),
         city=draw(st.text(min_size=1, max_size=50)),
-        remote_type=draw(st.sampled_from(list(WorkSettingType))),
+        work_setting_type=draw(st.sampled_from(list(WorkSettingType))),
         status=draw(st.sampled_from(list(JobStatus))),
         employment_type=draw(st.sampled_from(list(EmploymentType))),
         notes=draw(st.text(min_size=0, max_size=1000)),
@@ -51,7 +51,7 @@ def test_job_init(job):
     assert isinstance(job.country, Country)
     assert len(job.title) > 0
     assert job.status in JobStatus
-    assert job.remote_type in WorkSettingType
+    assert job.work_setting_type in WorkSettingType
     assert job.employment_type in EmploymentType
     assert job.created_at is not None
     assert job.updated_at is not None

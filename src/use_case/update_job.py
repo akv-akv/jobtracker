@@ -1,9 +1,9 @@
-from src.repository.job_base import JobRepository
+from src.repository.base.repository import Repository
 from src.requests.update_job import UpdateJobInvalidRequest, build_update_job_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 
-def update_job(data, repository: JobRepository):
+async def update_job(data, repository: Repository):
     """Update only the specified fields of a job."""
     # Build the request and validate it
     request = build_update_job_request(data)
@@ -12,12 +12,12 @@ def update_job(data, repository: JobRepository):
 
     try:
         # Fetch the existing job from the repository
-        job = repository.read(request.data["id"])
+        job = await repository.get(request.data["id"])
         if not job:
             return ResponseFailure(ResponseTypes.RESOURCE_ERROR, "Job not found.")
         # Save the updated job back to the repository
-        repository.update(job.id, data)
-        job = repository.read(request.data["id"])
+        await repository.update(job.id, data)
+        job = await repository.get(request.data["id"])
         return ResponseSuccess(job)
     except ValueError as e:
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, str(e))

@@ -1,19 +1,20 @@
-from typing import Any
+from typing import Any, Optional
 
-from src.repository.job_base import JobRepository
+from src.repository.base.repository import Repository
 from src.requests.list_jobs import InvalidRequest, build_job_list_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 
-def list_jobs(
-    filters: Any, repository: JobRepository
+async def list_jobs(
+    filters: Any, repository: Repository, params: Optional[dict[str, Any]] = None
 ) -> ResponseSuccess | ResponseFailure:
-    request = build_job_list_request(filters)
+    request = build_job_list_request(filters, params)
     if isinstance(request, InvalidRequest):
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
     try:
-        jobs = repository.list(request.filters)
+        print(request.params)
+        jobs = await repository.filter(filters=request.filters, params=request.params)
         return ResponseSuccess(jobs)
     except Exception as exc:
         return ResponseFailure(ResponseTypes.SYSTEM_ERROR, exc)

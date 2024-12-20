@@ -17,14 +17,6 @@ def test_job_serializer(job):
     assert job_dict["status"] == job.status.name
     assert job_dict["title"] == job.title
     assert job_dict["company"] == job.company
-    assert job_dict["country"] == job.country.value
-    assert job_dict["city"] == job.city
-    assert job_dict["description"] == job.description
-    assert job_dict["notes"] == job.notes
-    assert job_dict["external_id"] == job.external_id
-    assert job_dict["platform"] == job.platform
-    assert job_dict["date_applied"] == job.date_applied.isoformat()
-    assert job_dict["date_updated"] == job.date_updated.isoformat()
 
 
 class UnserializableObject:

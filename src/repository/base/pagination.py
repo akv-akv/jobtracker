@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 @dataclass
 class PageOptions:
-    limit: int
+    limit: int = 10
     offset: int = 0
     order_by: str = "created_at"
     ascending: bool = True

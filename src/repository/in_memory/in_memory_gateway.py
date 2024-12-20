@@ -40,7 +40,7 @@ class InMemoryGateway(Gateway):
                     break
             else:
                 result.append(deepcopy(x))
-        if params is not None:
+        if params:
             result = self._paginate(result, params)
         return result
 

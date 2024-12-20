@@ -91,7 +91,7 @@ book = Table(
 )
 
 
-ALL_FIELDS = "author.id, author.value, author.updated_at"
+ALL_FIELDS = "author.id, author.name, author.updated_at"
 BOOK_FIELDS = "book.id, book.title, book.author_id"
 
 
@@ -117,22 +117,22 @@ def related_sql_gateway():
     "filters,sql",
     [
         ([], " WHERE true"),
-        ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
+        ([Filter(field="name", values=[])], " WHERE false"),
+        ([Filter(field="name", values=["foo"])], " WHERE author.name = 'foo'"),
         (
-            [Filter(field="value", values=["foo", "bar"])],
-            " WHERE author.value IN ('foo', 'bar')",
+            [Filter(field="name", values=["foo", "bar"])],
+            " WHERE author.name IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
-            [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE author.id = 1 AND author.value = 'foo'",
+            [Filter(field="id", values=[1]), Filter(field="name", values=["foo"])],
+            " WHERE author.id = 1 AND author.name = 'foo'",
         ),
     ],
 )
 async def test_filter(sql_gateway, filters, sql):
-    sql_gateway.provider.result.return_value = [{"id": 2, "value": "foo"}]
-    assert await sql_gateway.filter(filters) == [{"id": 2, "value": "foo"}]
+    sql_gateway.provider.result.return_value = [{"id": 2, "name": "foo"}]
+    assert await sql_gateway.filter(filters) == [{"id": 2, "name": "foo"}]
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
@@ -155,9 +155,9 @@ async def test_filter(sql_gateway, filters, sql):
     ],
 )
 async def test_filter_with_pagination(sql_gateway, page_options, sql):
-    sql_gateway.provider.result.return_value = [{"id": 2, "value": "foo"}]
+    sql_gateway.provider.result.return_value = [{"id": 2, "name": "foo"}]
     assert await sql_gateway.filter([], params=page_options) == [
-        {"id": 2, "value": "foo"}
+        {"id": 2, "name": "foo"}
     ]
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
@@ -167,17 +167,17 @@ async def test_filter_with_pagination(sql_gateway, page_options, sql):
 
 
 async def test_filter_with_pagination_and_filter(sql_gateway):
-    sql_gateway.provider.result.return_value = [{"id": 2, "value": "foo"}]
+    sql_gateway.provider.result.return_value = [{"id": 2, "name": "foo"}]
     assert await sql_gateway.filter(
-        [Filter(field="value", values=["foo"])],
+        [Filter(field="name", values=["foo"])],
         params=PageOptions(limit=5, order_by="id"),
-    ) == [{"id": 2, "value": "foo"}]
+    ) == [{"id": 2, "name": "foo"}]
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
         (
             f"SELECT {ALL_FIELDS} FROM author "
-            f"WHERE author.value = 'foo' "
+            f"WHERE author.name = 'foo' "
             f"ORDER BY author.id ASC LIMIT 5 OFFSET 0"
         ),
     )
@@ -187,16 +187,16 @@ async def test_filter_with_pagination_and_filter(sql_gateway):
     "filters,sql",
     [
         ([], " WHERE true"),
-        ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
+        ([Filter(field="name", values=[])], " WHERE false"),
+        ([Filter(field="name", values=["foo"])], " WHERE author.name = 'foo'"),
         (
-            [Filter(field="value", values=["foo", "bar"])],
-            " WHERE author.value IN ('foo', 'bar')",
+            [Filter(field="name", values=["foo", "bar"])],
+            " WHERE author.name IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
-            [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE author.id = 1 AND author.value = 'foo'",
+            [Filter(field="id", values=[1]), Filter(field="name", values=["foo"])],
+            " WHERE author.id = 1 AND author.name = 'foo'",
         ),
     ],
 )
@@ -212,7 +212,7 @@ async def test_count(sql_gateway, filters, sql):
 
 @mock.patch.object(SQLGateway, "filter")
 async def test_get(filter_m, sql_gateway):
-    filter_m.return_value = [{"id": 2, "value": "foo"}]
+    filter_m.return_value = [{"id": 2, "name": "foo"}]
     assert await sql_gateway.get(2) == filter_m.return_value[0]
     assert len(sql_gateway.provider.queries) == 0
     filter_m.assert_awaited_once_with([Filter(field="id", values=[2])], params=None)
@@ -230,14 +230,14 @@ async def test_get_does_not_exist(filter_m, sql_gateway):
     "record,sql",
     [
         ({}, "DEFAULT VALUES"),
-        ({"value": "foo"}, "(value) VALUES ('foo')"),
-        ({"id": None, "value": "foo"}, "(value) VALUES ('foo')"),
-        ({"id": 2, "value": "foo"}, "(id, value) VALUES (2, 'foo')"),
-        ({"value": "foo", "nonexisting": 2}, "(value) VALUES ('foo')"),
+        ({"name": "foo"}, "(name) VALUES ('foo')"),
+        ({"id": None, "name": "foo"}, "(name) VALUES ('foo')"),
+        ({"id": 2, "name": "foo"}, "(id, name) VALUES (2, 'foo')"),
+        ({"name": "foo", "nonexisting": 2}, "(name) VALUES ('foo')"),
     ],
 )
 async def test_add(sql_gateway, record, sql):
-    records = [{"id": 2, "value": "foo"}]
+    records = [{"id": 2, "name": "foo"}]
     sql_gateway.provider.result.return_value = records
     assert await sql_gateway.add(record) == records[0]
     assert len(sql_gateway.provider.queries) == 1
@@ -251,23 +251,23 @@ async def test_add(sql_gateway, record, sql):
     "record,if_unmodified_since,sql",
     [
         (
-            {"id": 2, "value": "foo"},
+            {"id": 2, "name": "foo"},
             None,
-            "SET id=2, value='foo' WHERE author.id = 2",
+            "SET id=2, name='foo' WHERE author.id = 2",
         ),
         ({"id": 2, "other": "foo"}, None, "SET id=2 WHERE author.id = 2"),
         (
-            {"id": 2, "value": "foo"},
+            {"id": 2, "name": "foo"},
             datetime(2010, 1, 1, tzinfo=timezone.utc),
             (
-                "SET id=2, value='foo' WHERE author.id = 2 "
+                "SET id=2, name='foo' WHERE author.id = 2 "
                 "AND author.updated_at = '2010-01-01 00:00:00+00:00'"
             ),
         ),
     ],
 )
 async def test_update(sql_gateway, record, if_unmodified_since, sql):
-    records = [{"id": 2, "value": "foo"}]
+    records = [{"id": 2, "name": "foo"}]
     sql_gateway.provider.result.return_value = records
     assert await sql_gateway.update(record, if_unmodified_since) == records[0]
     assert len(sql_gateway.provider.queries) == 1
@@ -329,16 +329,16 @@ async def test_remove_does_not_exist(sql_gateway):
 
 
 async def test_upsert(sql_gateway):
-    record = {"id": 2, "value": "foo"}
+    record = {"id": 2, "name": "foo"}
     sql_gateway.provider.result.return_value = [record]
     assert await sql_gateway.upsert(record) == record
     assert len(sql_gateway.provider.queries) == 1
     assert_query_equal(
         sql_gateway.provider.queries[0][0],
         (
-            f"INSERT INTO author (id, value) VALUES (2, 'foo') "
+            f"INSERT INTO author (id, name) VALUES (2, 'foo') "
             f"ON CONFLICT (id) DO UPDATE SET "
-            f"id = %(param_1)s, value = %(param_2)s "
+            f"id = %(param_1)s, name = %(param_2)s "
             f"RETURNING {ALL_FIELDS}"
         ),
     )
@@ -346,10 +346,10 @@ async def test_upsert(sql_gateway):
 
 @mock.patch.object(SQLGateway, "add")
 async def test_upsert_no_id(add_m, sql_gateway):
-    add_m.return_value = {"id": 5, "value": "foo"}
-    assert await sql_gateway.upsert({"value": "foo"}) == add_m.return_value
+    add_m.return_value = {"id": 5, "name": "foo"}
+    assert await sql_gateway.upsert({"name": "foo"}) == add_m.return_value
 
-    add_m.assert_awaited_once_with({"value": "foo"})
+    add_m.assert_awaited_once_with({"name": "foo"})
     assert len(sql_gateway.provider.queries) == 0
 
 
@@ -463,11 +463,11 @@ async def test_set_related_one_to_many(
 
 
 async def test_update_transactional(sql_gateway):
-    existing = {"id": 2, "value": "foo"}
-    expected = {"id": 2, "value": "bar"}
+    existing = {"id": 2, "name": "foo"}
+    expected = {"id": 2, "name": "bar"}
     sql_gateway.provider.result.side_effect = ([existing], [expected])
     actual = await sql_gateway.update_transactional(
-        2, lambda x: {"id": x["id"], "value": "bar"}
+        2, lambda x: {"id": x["id"], "name": "bar"}
     )
     assert actual == expected
 
@@ -480,7 +480,7 @@ async def test_update_transactional(sql_gateway):
     assert_query_equal(
         queries[1],
         (
-            "UPDATE author SET id=2, value='bar' WHERE author.id = 2 "
+            "UPDATE author SET id=2, name='bar' WHERE author.id = 2 "
             f"RETURNING {ALL_FIELDS}"
         ),
     )
@@ -490,16 +490,16 @@ async def test_update_transactional(sql_gateway):
     "filters,sql",
     [
         ([], " WHERE true"),
-        ([Filter(field="value", values=[])], " WHERE false"),
-        ([Filter(field="value", values=["foo"])], " WHERE author.value = 'foo'"),
+        ([Filter(field="name", values=[])], " WHERE false"),
+        ([Filter(field="name", values=["foo"])], " WHERE author.name = 'foo'"),
         (
-            [Filter(field="value", values=["foo", "bar"])],
-            " WHERE author.value IN ('foo', 'bar')",
+            [Filter(field="name", values=["foo", "bar"])],
+            " WHERE author.name IN ('foo', 'bar')",
         ),
         ([Filter(field="nonexisting", values=["foo"])], " WHERE false"),
         (
-            [Filter(field="id", values=[1]), Filter(field="value", values=["foo"])],
-            " WHERE author.id = 1 AND author.value = 'foo'",
+            [Filter(field="id", values=[1]), Filter(field="name", values=["foo"])],
+            " WHERE author.id = 1 AND author.name = 'foo'",
         ),
     ],
 )
