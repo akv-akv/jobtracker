@@ -1,5 +1,7 @@
 alembic
+asyncpg
 backoff
+greenlet
 inject
 psycopg2-binary
 SQLAlchemy
