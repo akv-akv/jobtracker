@@ -1,16 +1,16 @@
-from src.repository.base.repository import Repository
+from src.application.base.manage import Manage
 from src.requests.delete_job import DeleteJobInvalidRequest, build_delete_job_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 
-async def delete_job(id, repository: Repository):
+async def delete_job(id, job_manager: Manage):
     """Use case for adding a job."""
     request = build_delete_job_request(id)
 
     if isinstance(request, DeleteJobInvalidRequest):
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
-    response = await repository.remove(id)
+    response = await job_manager.destroy(id)
     return (
         ResponseSuccess(id)
         if response

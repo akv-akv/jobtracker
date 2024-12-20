@@ -1,10 +1,9 @@
-from src.domain.entity.job import Job
-from src.repository.base.repository import Repository
+from src.application.base.manage import Manage
 from src.requests.add_job import AddJobInvalidRequest, build_add_job_request
 from src.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 
 
-async def add_job(data: dict, repository: Repository):
+async def add_job(data: dict, manager: Manage):
     """
     Use case for adding a job asynchronously.
 
@@ -23,14 +22,12 @@ async def add_job(data: dict, repository: Repository):
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
     try:
-        # Create a job entity from the request data
-        job = Job.create(**request.data)
         # Add the job to the repository
-        await repository.add(job)
+        response = await manager.create(request.data)
         # print(request.data)
 
         # Return a success response with the created job
-        return ResponseSuccess(job)
+        return ResponseSuccess(response)
 
     except ValueError as e:
         # Handle validation errors and return a failure response
