@@ -14,3 +14,27 @@ venv-dev: clean
 clean:
 	rm -rf __pycache__
 	rm -rf $(VENV)
+
+alembic-upgrade:
+	@echo "Running alembic upgrade..."
+	POSTGRES_USER=postgres \
+	POSTGRES_PASSWORD=postgres \
+	POSTGRES_HOSTNAME=localhost \
+	APPLICATION_DB=jobtracker \
+	$(VENV)/bin/alembic upgrade head
+
+alembic-autogenerate:
+	@echo "Running alembic autogenerate..."
+	POSTGRES_USER=postgres \
+	POSTGRES_PASSWORD=postgres \
+	POSTGRES_HOSTNAME=localhost \
+	APPLICATION_DB=jobtracker \
+	$(VENV)/bin/alembic revision --autogenerate -m "Initial"
+
+alembic-downgrade:
+	@echo "Running alembic autogenerate..."
+	POSTGRES_USER=postgres \
+	POSTGRES_PASSWORD=postgres \
+	POSTGRES_HOSTNAME=localhost \
+	APPLICATION_DB=jobtracker \
+	$(VENV)/bin/alembic downgrade -1
