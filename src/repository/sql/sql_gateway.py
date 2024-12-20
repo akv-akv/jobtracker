@@ -143,7 +143,7 @@ class SQLGateway(Gateway):
         return result
 
     async def count(self, filters: list[Filter]) -> int:
-        return (await self.execute(self.builder.count(filters)))[0]["count"]
+        return (await self.provider.execute(self.builder.count(filters)))[0]["count"]
 
     async def exists(self, filters: list[Filter]) -> bool:
         return len(await self.execute(self.builder.exists(filters))) > 0
