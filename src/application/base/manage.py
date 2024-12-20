@@ -1,5 +1,3 @@
-# (c) Nelen & Schuurmans
-
 from typing import Any, Generic, List, TypeVar
 from uuid import UUID
 
