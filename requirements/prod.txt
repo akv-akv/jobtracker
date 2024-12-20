@@ -1,4 +1,5 @@
 alembic
+async-lru
 asyncpg
 backoff
 greenlet

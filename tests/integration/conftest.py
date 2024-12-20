@@ -1,4 +1,4 @@
-import os
+import asyncio
 
 import pytest
 from sqlalchemy import (
@@ -26,7 +26,6 @@ test_model = Table(
     Column("json", postgresql.JSONB(astext_type=Text()), nullable=True),
 )
 
-
 # For SQLProvider integration tests
 count_query = text("SELECT COUNT(*) FROM test_model")
 insert_query = text(
@@ -37,12 +36,12 @@ insert_query = text(
 update_query = text("UPDATE test_model SET t='bar' WHERE id=:id RETURNING t")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def postgres_url():
-    return os.environ.get("POSTGRES_URL", "postgres:postgres@localhost:5434")
+    return "postgres:postgres@localhost:5434"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 async def postgres_db_url(postgres_url) -> str:
     from sqlalchemy import create_engine, text
 
@@ -63,3 +62,10 @@ async def postgres_db_url(postgres_url) -> str:
         test_model.metadata.create_all(engine)
     engine.dispose()
     return f"{postgres_url}/{dbname}"
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()

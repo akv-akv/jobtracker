@@ -67,8 +67,10 @@ class SQLAlchemyAsyncSQLDatabase(SQLDatabase):
     async def testing_transaction(self) -> AsyncIterator[SQLProvider]:  # type: ignore
         async with self.engine.connect() as connection:
             async with connection.begin() as transaction:
-                yield SQLAlchemyAsyncSQLTransaction(connection)
-                await transaction.rollback()
+                try:
+                    yield SQLAlchemyAsyncSQLTransaction(connection)
+                finally:
+                    await transaction.rollback()
 
     async def execute_autocommit(self, query: Executable) -> None:
         engine = create_async_engine(self.engine.url, isolation_level="AUTOCOMMIT")

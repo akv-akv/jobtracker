@@ -1,4 +1,5 @@
 -r prod.txt
+debugpy
 hypothesis
 pytest
 pytest-asyncio
