@@ -9,7 +9,8 @@ from src.domain.base.exceptions import AlreadyExists, Conflict, DoesNotExist
 from src.repository.base.filter import Filter
 from src.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.repository.sql.sql_gateway import SQLDatabase, SQLGateway
-from tests.integration.conftest import test_model
+
+from .conftest import test_model
 
 pytestmark = pytest.mark.integration
 
