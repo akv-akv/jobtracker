@@ -31,6 +31,7 @@ class Manage(Generic[T]):
         return await self.repo.get(id)
 
     async def create(self, values: dict[str, Any]) -> T:
+        """Accepts values that should match entity attribute types"""
         return await self.repo.add(values)
 
     async def update(

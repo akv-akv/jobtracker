@@ -3,12 +3,14 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 import pytest
-from sqlalchemy import Boolean, Column, DateTime, Float, MetaData, Table, Text, text
+from sqlalchemy import Boolean, Column, DateTime, Enum, Float, MetaData, Table, Text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.application.base.manage import Manage
 from src.domain.base.root_entity import RootEntity
+from src.domain.enums.country import Country
+from src.repository.base.mapper import Mapper
 from src.repository.base.repository import Repository
 from src.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.repository.sql.sql_gateway import SQLGateway
@@ -20,19 +22,12 @@ test_model = Table(
     Column("t", Text, nullable=False),
     Column("f", Float, nullable=False),
     Column("b", Boolean, nullable=False),
+    Column("c", Enum(Country)),
     Column("updated_at", DateTime(timezone=True), nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("n", Float, nullable=True),
     Column("json", postgresql.JSONB(astext_type=Text()), nullable=True),
 )
-# For SQLProvider integration tests
-count_query = text("SELECT COUNT(*) FROM test_model")
-insert_query = text(
-    "INSERT INTO test_model (t, f, b, updated_at) "
-    "VALUES ('foo', 1.23, TRUE, '2016-06-22 19:10:25-07') "
-    "RETURNING id"
-)
-update_query = text("UPDATE test_model SET t='bar' WHERE id=:id RETURNING t")
 
 
 @pytest.fixture
@@ -75,6 +70,7 @@ class Tst(RootEntity):
     t: str
     f: float
     b: bool
+    c: Country
     n: Optional[float] = None
     json: Optional[dict[str, Any]] = None
 
@@ -99,10 +95,40 @@ class TstManage(Manage[Tst]):
     pass
 
 
+class TstMapper(Mapper):
+    def to_internal(self, external):
+        internal = {
+            "id": external.get("id"),
+            "t": external.get("t"),
+            "f": external.get("f"),
+            "b": external.get("b"),
+            "c": Country[external.get("c")],
+            "n": external.get("n"),
+            "json": external.get("json"),
+            "created_at": external.get("created_at"),
+            "updated_at": external.get("updated_at"),
+        }
+        return internal
+
+    def to_external(self, internal):
+        external = {
+            "id": internal.get("id"),
+            "t": internal.get("t"),
+            "f": internal.get("f"),
+            "b": internal.get("b"),
+            "c": internal.get("c").name,
+            "n": internal.get("n"),
+            "json": internal.get("json"),
+            "created_at": internal.get("created_at"),
+            "updated_at": internal.get("updated_at"),
+        }
+        return external
+
+
 class TstSQLGateway(SQLGateway, table=test_model):
     """SQL Gateway for Tst entity."""
 
-    pass
+    mapper = TstMapper()
 
 
 @pytest.fixture

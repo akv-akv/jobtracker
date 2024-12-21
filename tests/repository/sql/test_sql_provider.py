@@ -27,7 +27,6 @@ def sql_database(mock_connection, mock_engine):
     return SQLDatabase(connection=mock_connection, engine=mock_engine)
 
 
-@pytest.mark.asyncio
 async def test_execute(sql_provider, mock_connection):
     # Mock fetchall response
     mock_connection.execute.return_value.fetchall.return_value = [
@@ -42,7 +41,6 @@ async def test_execute(sql_provider, mock_connection):
     assert result == [{"id": 1, "name": "test"}, {"id": 2, "name": "example"}]
 
 
-@pytest.mark.asyncio
 async def test_transaction(sql_provider, mock_connection):
     async with sql_provider.transaction() as provider:
         assert provider == sql_provider
@@ -50,7 +48,6 @@ async def test_transaction(sql_provider, mock_connection):
     mock_connection.begin.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_testing_transaction_success(sql_provider, mock_connection):
     async with sql_provider.testing_transaction() as provider:
         assert provider == sql_provider
@@ -66,7 +63,6 @@ async def test_testing_transaction_success(sql_provider, mock_connection):
     ), "RELEASE SAVEPOINT test_savepoint not called"
 
 
-@pytest.mark.asyncio
 async def test_testing_transaction_failure(sql_provider, mock_connection):
     mock_connection.execute.side_effect = Exception("Test Exception")
 
@@ -84,7 +80,6 @@ async def test_testing_transaction_failure(sql_provider, mock_connection):
     ), "SAVEPOINT test_savepoint not called"
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "method_name, sql, args",
     [
@@ -101,7 +96,6 @@ async def test_sql_methods(sql_database, method_name, sql, args):
         assert str(sql_query) == sql
 
 
-@pytest.mark.asyncio
 async def test_truncate_tables(sql_database):
     sql_database.execute_autocommit = AsyncMock()
 

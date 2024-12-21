@@ -20,7 +20,7 @@ class ValueObject:
         """
         Validates the types of provided values against the type annotations.
         """
-        annotations = get_type_hints(cls)  # More robust than __annotations__
+        annotations = get_type_hints(cls)
         for field_name, field_value in values.items():
             if field_name in annotations and not isinstance(
                 field_value, annotations[field_name]
