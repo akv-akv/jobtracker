@@ -2,7 +2,7 @@
 # import sqlalchemy
 # from sqlalchemy.orm import sessionmaker
 
-# from src.repository.job_postgres import Base, JobSQLModel
+# from src.core.repository.job_postgres import Base, JobSQLModel
 
 
 # @pytest.fixture(scope="session")

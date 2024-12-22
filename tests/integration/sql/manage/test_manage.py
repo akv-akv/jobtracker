@@ -3,7 +3,7 @@ from uuid import UUID
 
 import pytest
 
-from src.domain.enums.country import Country
+from src.application.domain.enums.country import Country
 
 pytestmark = pytest.mark.integration
 

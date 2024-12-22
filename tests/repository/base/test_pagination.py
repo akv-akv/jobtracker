@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.repository.base.pagination import Page, PageOptions
+from src.core.repository.base.pagination import Page, PageOptions
 
 
 # Test PageOptions

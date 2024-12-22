@@ -3,7 +3,7 @@ import json
 import pytest
 from hypothesis import given
 
-from src.serializers.job import JobJsonEncoder
+from src.application.serializers.job import JobJsonEncoder
 from tests.domain.entity.test_job import job_strategy
 
 

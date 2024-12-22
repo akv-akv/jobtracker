@@ -74,6 +74,25 @@ def docker_compose_cmdline(commands_string: Optional[str] = None) -> list:
     return command_line
 
 
+def get_database_url(config_name: str) -> str:
+    """Load the database configuration dynamically."""
+    configure_app(
+        config_name
+    )  # Replace with the desired environment (e.g., testing, development)
+    db_config = {
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOSTNAME"),
+        "PORT": os.getenv("POSTGRES_PORT"),
+        "NAME": os.getenv("APPLICATION_DB"),
+    }
+    return (
+        f"{db_config['USER']}:"
+        f"{db_config['PASSWORD']}@{db_config['HOST']}:"
+        f"{db_config['PORT']}/{db_config['NAME']}"
+    )
+
+
 def run_sql(statements: list):
     """Run SQL statements on the database."""
     conn = psycopg2.connect(

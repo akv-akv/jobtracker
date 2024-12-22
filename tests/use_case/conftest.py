@@ -1,7 +1,7 @@
 import pytest
 
 from src.application.job import JobRepository, ManageJob
-from src.repository.in_memory.in_memory_gateway import InMemoryGateway
+from src.core.repository.in_memory.in_memory_gateway import InMemoryGateway
 
 
 @pytest.fixture

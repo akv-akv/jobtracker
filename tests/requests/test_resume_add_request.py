@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from src.requests.add_resume import build_add_resume_request
+from src.application.requests.add_resume import build_add_resume_request
 
 
 def test_build_add_resume_request_no_data():

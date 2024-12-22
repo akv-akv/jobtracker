@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from src.domain.base.root_entity import RootEntity
+from src.core.domain.root_entity import RootEntity
 
 
 # Example entity extending RootEntity
@@ -27,7 +27,7 @@ def user():
 @pytest.fixture
 def patched_now():
     SOME_DATETIME = datetime(2023, 1, 1, tzinfo=timezone.utc)
-    with mock.patch("src.domain.base.root_entity.now", return_value=SOME_DATETIME):
+    with mock.patch("src.core.domain.root_entity.now", return_value=SOME_DATETIME):
         yield SOME_DATETIME
 
 

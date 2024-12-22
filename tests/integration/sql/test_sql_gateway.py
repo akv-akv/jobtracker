@@ -5,10 +5,10 @@ from asyncpg.exceptions import NotNullViolationError
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from src.domain.base.exceptions import AlreadyExists, Conflict, DoesNotExist
-from src.repository.base.filter import Filter
-from src.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.repository.sql.sql_gateway import SQLDatabase, SQLGateway
+from src.core.domain.exceptions import AlreadyExists, Conflict, DoesNotExist
+from src.core.repository.base.filter import Filter
+from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
+from src.core.repository.sql.sql_gateway import SQLDatabase, SQLGateway
 
 from .conftest import test_model
 

@@ -5,12 +5,12 @@ from uuid import uuid4
 
 import pytest
 
-from src.domain.base.exceptions import DoesNotExist
-from src.domain.base.root_entity import RootEntity
-from src.repository.base.filter import Filter
-from src.repository.base.pagination import Page, PageOptions
-from src.repository.base.repository import Repository
-from src.repository.in_memory.in_memory_gateway import InMemoryGateway
+from src.core.domain.exceptions import DoesNotExist
+from src.core.domain.root_entity import RootEntity
+from src.core.repository.base.filter import Filter
+from src.core.repository.base.pagination import Page, PageOptions
+from src.core.repository.base.repository import Repository
+from src.core.repository.in_memory.in_memory_gateway import InMemoryGateway
 
 
 @dataclass(frozen=True)

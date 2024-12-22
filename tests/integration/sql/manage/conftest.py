@@ -7,13 +7,13 @@ from sqlalchemy import Boolean, Column, DateTime, Enum, Float, MetaData, Table, 
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
-from src.application.base.manage import Manage
-from src.domain.base.root_entity import RootEntity
-from src.domain.enums.country import Country
-from src.repository.base.mapper import Mapper
-from src.repository.base.repository import Repository
-from src.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.repository.sql.sql_gateway import SQLGateway
+from src.application.domain.enums.country import Country
+from src.core.domain.root_entity import RootEntity
+from src.core.manage import Manage
+from src.core.repository.base.mapper import Mapper
+from src.core.repository.base.repository import Repository
+from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
+from src.core.repository.sql.sql_gateway import SQLGateway
 
 test_model = Table(
     "test_model",
@@ -96,7 +96,7 @@ class TstManage(Manage[Tst]):
 
 
 class TstMapper(Mapper):
-    def to_internal(self, external):
+    async def to_internal(self, external):
         internal = {
             "id": external.get("id"),
             "t": external.get("t"),
@@ -110,7 +110,7 @@ class TstMapper(Mapper):
         }
         return internal
 
-    def to_external(self, internal):
+    async def to_external(self, internal):
         external = {
             "id": internal.get("id"),
             "t": internal.get("t"),

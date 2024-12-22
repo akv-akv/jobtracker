@@ -1,7 +1,7 @@
-from src.domain.entity.job import JobStatus, WorkSettingType
-from src.domain.entity.user import User
-from src.domain.enums.country import Country
-from src.requests.add_job import build_add_job_request
+from src.application.domain.entity.job import JobStatus, WorkSettingType
+from src.application.domain.entity.user import User
+from src.application.domain.enums.country import Country
+from src.application.requests.add_job import build_add_job_request
 
 
 def test_build_add_job_request_empty_data():

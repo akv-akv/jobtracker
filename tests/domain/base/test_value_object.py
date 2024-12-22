@@ -3,7 +3,7 @@ from typing import Optional
 
 import pytest
 
-from src.domain.base.value_object import ValueObject
+from src.core.domain.value_object import ValueObject
 
 
 @dataclass(frozen=True)

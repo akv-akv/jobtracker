@@ -2,11 +2,11 @@ from uuid import uuid4
 
 import pytest
 
-from src.domain.entity.job import JobStatus, WorkSettingType
-from src.domain.entity.user import User
-from src.domain.enums.country import Country
-from src.responses.response import ResponseTypes
-from src.use_case.list_jobs import list_jobs
+from src.application.domain.entity.job import JobStatus, WorkSettingType
+from src.application.domain.entity.user import User
+from src.application.domain.enums.country import Country
+from src.application.use_case.list_jobs import list_jobs
+from src.core.responses.response import ResponseTypes
 
 
 @pytest.fixture

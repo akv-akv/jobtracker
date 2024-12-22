@@ -1,5 +1,5 @@
-from src.requests.base_request import InvalidRequest
-from src.responses.response import (
+from src.core.base_request import InvalidRequest
+from src.core.responses.response import (
     ResponseFailure,
     ResponseSuccess,
     ResponseTypes,

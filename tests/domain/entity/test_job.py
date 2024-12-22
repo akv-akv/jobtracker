@@ -3,9 +3,14 @@ from uuid import UUID
 from hypothesis import given, strategies as st
 from hypothesis.strategies import composite
 
-from src.domain.entity.job import EmploymentType, Job, JobStatus, WorkSettingType
-from src.domain.entity.user import User
-from src.domain.enums.country import Country
+from src.application.domain.entity.job import (
+    EmploymentType,
+    Job,
+    JobStatus,
+    WorkSettingType,
+)
+from src.application.domain.entity.user import User
+from src.application.domain.enums.country import Country
 
 
 @composite

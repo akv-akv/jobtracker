@@ -1,57 +1,27 @@
 #! /usr/bin/env python
 import asyncio
-import os
 from functools import wraps
 from typing import Optional
 from uuid import UUID
 
 import typer
 
-from application import JobRepository, ManageJob, ManageUser, UserRepository
-from infrastructure import JobSQLGateway, UserSQLGateway
-from manage import configure_app
-from src.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
-from src.domain.enums.country import Country
-from src.repository.base.pagination import PageOptions
-from src.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.use_case.add_job import add_job as add_job_use_case
+from src.application.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
+from src.application.domain.enums.country import Country
+from src.application.job import manage_job
+from src.application.use_case.add_job import add_job as add_job_use_case
+from src.application.user import manage_user
+from src.core.repository.base.pagination import PageOptions
+from src.core.responses.response import ResponseTypes
 
-# from src.use_case.delete_job import delete_job as delete_job_use_case
-# from src.use_case.list_jobs import list_jobs as list_jobs_use_case
-# from src.use_case.update_job import update_job as update_job_use_case
+# from src.application.use_case.delete_job import delete_job as delete_job_use_case
+# from src.application.use_case.list_jobs import list_jobs as list_jobs_use_case
+# from src.application.use_case.update_job import update_job as update_job_use_case
 
-# from src.repository.job_postgres import JobRepositoryPostgres
+# from src.core.repository.job_postgres import JobRepositoryPostgres
 
 
 app = typer.Typer(help="Job Tracker CLI Tool")
-
-
-def get_database_url() -> str:
-    """Load the database configuration dynamically."""
-    configure_app(
-        "production"
-    )  # Replace with the desired environment (e.g., testing, development)
-    db_config = {
-        "USER": os.getenv("POSTGRES_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("POSTGRES_HOSTNAME"),
-        "PORT": os.getenv("POSTGRES_PORT"),
-        "NAME": os.getenv("APPLICATION_DB"),
-    }
-    return (
-        f"{db_config['USER']}:"
-        f"{db_config['PASSWORD']}@{db_config['HOST']}:"
-        f"{db_config['PORT']}/{db_config['NAME']}"
-    )
-
-
-db = AsyncpgSQLDatabase(get_database_url())
-
-
-job_gateway = JobSQLGateway(db)
-manage_job = ManageJob(JobRepository(job_gateway))
-user_gateway = UserSQLGateway(db)
-manage_user = ManageUser(UserRepository(user_gateway))
 
 
 def typer_async(f):
@@ -85,7 +55,7 @@ async def add_job(
     title: str = typer.Argument(..., help="Title of the job."),
     company: str = typer.Argument(..., help="Company offering the job."),
     status: JobStatus = typer.Option(JobStatus.ADDED.value, help="Job status."),
-    country: str = typer.Option(
+    country: Country = typer.Option(
         Country.UnitedArabEmirates.value, help="Country of the job."
     ),
     city: str = typer.Option("Remote", help="City of the job."),
@@ -140,14 +110,14 @@ async def add_job(
     }
 
     response = await add_job_use_case(data, manage_job)
-    print(response.message)
-    if response:
+    # print(response.message)
+    if response.type == ResponseTypes.SUCCESS:
         typer.echo(
-            f"Job '{response.title}' at "
-            f"'{response.company}' added successfully (id = {response.id})."
+            f"Job '{response.value.title}' at "
+            f"'{response.value.company}' added successfully (id = {response.value.id})."
         )
     else:
-        typer.echo("Job creation failed")
+        typer.echo(f"Job creation failed: {response.value}")
 
 
 @app.command()

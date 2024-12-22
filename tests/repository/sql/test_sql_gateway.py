@@ -18,12 +18,12 @@ from sqlalchemy import (
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import Executable
 
-from src.domain.base.exceptions import Conflict, DoesNotExist
-from src.repository.base.filter import Filter
-from src.repository.base.mapper import Mapper
-from src.repository.base.pagination import PageOptions
-from src.repository.sql.sql_gateway import SQLGateway
-from src.repository.sql.sql_provider import SQLProvider
+from src.core.domain.exceptions import Conflict, DoesNotExist
+from src.core.repository.base.filter import Filter
+from src.core.repository.base.mapper import Mapper
+from src.core.repository.base.pagination import PageOptions
+from src.core.repository.sql.sql_gateway import SQLGateway
+from src.core.repository.sql.sql_provider import SQLProvider
 
 DIALECT = postgresql.dialect()
 
@@ -110,21 +110,13 @@ book = Table(
 
 
 class BookMapper(Mapper):
-    def to_external(self, internal):
+    async def to_external(self, internal):
         return {
             "id": internal.get("id"),
             "title": internal.get("title"),
             "book_type": internal.get("book_type"),
             "author_id": internal.get("author_id"),
         }
-
-    # def to_internal(self, external):
-    #     return {
-    #         "id": external["id"],
-    #         "title": external["title"],
-    #         "book_type": external["book_type"],
-    #         "author_id": external["author_id"],
-    #     }
 
 
 ALL_FIELDS = "author.id, author.name, author.updated_at"

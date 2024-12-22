@@ -3,8 +3,8 @@
 
 # import pytest
 
-# from src.domain.entity.job import Job, JobStatus
-# from src.repository.job_postgres import JobRepositoryPostgres
+# from src.application.domain.entity.job import Job, JobStatus
+# from src.core.repository.job_postgres import JobRepositoryPostgres
 
 # pytestmark = pytest.mark.integration
 

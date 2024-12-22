@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from src.repository.base.filter import ComparisonFilter, ComparisonOperator, Filter
+from src.core.repository.base.filter import ComparisonFilter, ComparisonOperator, Filter
 
 
 # Test for Filter class

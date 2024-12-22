@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.repository.base.filter import ComparisonFilter, ComparisonOperator, Filter
-from src.requests.list_jobs import build_job_list_request
+from src.application.requests.list_jobs import build_job_list_request
+from src.core.repository.base.filter import ComparisonFilter, ComparisonOperator, Filter
 
 
 def test_build_job_list_request_no_filters():
