@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from typing import Optional
 
 from src.application.domain.entity.user import User
@@ -8,27 +7,32 @@ from src.core.domain.root_entity import RootEntity
 
 
 class JobStatus(Enum):
-    ADDED = auto()
-    APPLIED = auto()
-    INTERVIEWING = auto()
-    OFFERED = auto()
-    REJECTED = auto()
-    ARCHIVED = auto()
+    """Enumeration for the status of a job application."""
+
+    ADDED = "added"  # Job added to the tracker
+    APPLIED = "applied"  # Application submitted
+    INTERVIEWING = "interviewing"  # Interview process ongoing
+    OFFERED = "offered"  # Job offer received
+    REJECTED = "rejected"  # Application rejected
+    ARCHIVED = "archived"  # Job archived (no further action)
 
 
 class EmploymentType(Enum):
-    FULLTIME = auto()
-    TEMPORARY = auto()
-    CONTRACT = auto()
+    """Enumeration for types of employment."""
+
+    FULLTIME = "fulltime"  # Full-time employment
+    TEMPORARY = "temporary"  # Temporary employment
+    CONTRACT = "contract"  # Contract-based employment
 
 
 class WorkSettingType(Enum):
-    REMOTE = auto()
-    HYBRID = auto()
-    ONSITE = auto()
+    """Enumeration for work setting preferences."""
+
+    REMOTE = "remote"  # Remote work
+    HYBRID = "hybrid"  # Combination of remote and onsite work
+    ONSITE = "onsite"  # Onsite work
 
 
-@dataclass(frozen=True)
 class Job(RootEntity):
     user: User
     title: str

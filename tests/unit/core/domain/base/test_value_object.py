@@ -1,12 +1,11 @@
-from dataclasses import dataclass
 from typing import Optional
 
 import pytest
+from pydantic import ValidationError
 
 from src.core.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True)
 class Color(ValueObject):
     name: str
     code: int
@@ -68,16 +67,17 @@ def test_create_success(input_values, expected_values):
     [
         (
             {"name": "green", "code": "invalid", "is_primary": True},
-            "Invalid type for field 'code'",
+            "1 validation error for Color\ncode\n  "
+            "Input should be a valid integer, unable to parse string as an integer",
         ),
         (
             {"name": "green", "is_primary": True},
-            "missing 1 required positional argument: 'code'",
+            "1 validation error for Color\ncode\n  Field required",
         ),
     ],
 )
 def test_create_invalid(invalid_input, error_message):
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(ValidationError) as e:
         Color.create(**invalid_input)
     assert error_message in str(e.value)
 
@@ -104,17 +104,17 @@ def test_update_optional_field_to_none(color):
 
 
 @pytest.mark.parametrize(
-    "field,invalid_value,error_message",
+    "field,invalid_value,expected_message",
     [
-        ("name", 123, "Invalid type for field 'name'"),
-        ("code", "invalid", "Invalid type for field 'code'"),
-        ("is_primary", "yes", "Invalid type for field 'is_primary'"),
+        ("name", 123, "Input should be a valid string"),
+        ("code", "invalid", "Input should be a valid integer"),
+        ("is_primary", "aaa", "Input should be a valid boolean"),
     ],
 )
-def test_update_wrong_type(color, field, invalid_value, error_message):
-    with pytest.raises(TypeError) as e:
+def test_update_wrong_type(color, field, invalid_value, expected_message):
+    with pytest.raises(ValidationError) as e:
         color.update(**{field: invalid_value})
-    assert error_message in str(e.value)
+    assert expected_message in str(e.value)
 
 
 def test_update_no_change(color):

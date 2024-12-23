@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from src.application.domain.entity.job import Job, JobStatus, WorkSettingType
+from src.application.domain.entity.job import JobStatus, WorkSettingType
 from src.application.domain.entity.user import User
 from src.application.domain.enums.country import Country
 from src.application.use_case.add_job import add_job
@@ -14,15 +14,13 @@ async def test_add_job_success(job_manager):
         "user": User.create(name="Kirill"),
         "title": "Software Engineer",
         "company": "TechCorp",
-        "status": JobStatus.APPLIED,
-        "country": Country.UnitedStates,
-        "work_setting_type": WorkSettingType.ONSITE,
+        "status": "applied",
+        "country": "US",
+        "work_setting_type": "onsite",
         "city": "NY",
         "description": "A challenging job opportunity.",
     }
-    Job.create(**data)
     response = await add_job(data, job_manager)
-    print(response)
     assert response.type == ResponseTypes.SUCCESS
 
     added_job = await job_manager.retrieve(data["id"])

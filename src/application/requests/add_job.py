@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from enum import Enum
+from typing import Any, Dict, Union
 
 from src.core.base_request import InvalidRequest, ValidRequest
 
@@ -14,7 +15,24 @@ class AddJobInvalidRequest(InvalidRequest):
     pass
 
 
-def build_add_job_request(data: Dict[str, Any]):
+class JobStatus(Enum):
+    ADDED = "added"
+    APPLIED = "applied"
+    INTERVIEWING = "interviewing"
+    OFFERED = "offered"
+    REJECTED = "rejected"
+    ARCHIVED = "archived"
+
+
+class WorkSettingType(Enum):
+    REMOTE = "remote"
+    HYBRID = "hybrid"
+    ONSITE = "onsite"
+
+
+def build_add_job_request(
+    data: Dict[str, Any],
+) -> Union[AddJobValidRequest, AddJobInvalidRequest]:
     """Factory for creating AddJobRequest."""
     if not isinstance(data, dict):
         invalid_req = AddJobInvalidRequest()

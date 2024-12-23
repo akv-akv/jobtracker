@@ -1,5 +1,4 @@
 import asyncio
-from dataclasses import dataclass
 from typing import Any, Optional
 
 import pytest
@@ -26,7 +25,7 @@ test_model = Table(
     Column("updated_at", DateTime(timezone=True), nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("n", Float, nullable=True),
-    Column("json", postgresql.JSONB(astext_type=Text()), nullable=True),
+    Column("jsn", postgresql.JSONB(astext_type=Text()), nullable=True),
 )
 
 
@@ -65,14 +64,13 @@ def event_loop():
     loop.close()
 
 
-@dataclass(frozen=True)
 class Tst(RootEntity):
     t: str
     f: float
     b: bool
     c: Country
     n: Optional[float] = None
-    json: Optional[dict[str, Any]] = None
+    jsn: Optional[dict[str, Any]] = None
 
 
 @pytest.fixture(params=[AsyncpgSQLDatabase])
@@ -104,7 +102,7 @@ class TstMapper(Mapper):
             "b": external.get("b"),
             "c": Country[external.get("c")],
             "n": external.get("n"),
-            "json": external.get("json"),
+            "jsn": external.get("jsn"),
             "created_at": external.get("created_at"),
             "updated_at": external.get("updated_at"),
         }
@@ -118,7 +116,7 @@ class TstMapper(Mapper):
             "b": internal.get("b"),
             "c": internal.get("c").name,
             "n": internal.get("n"),
-            "json": internal.get("json"),
+            "jsn": internal.get("jsn"),
             "created_at": internal.get("created_at"),
             "updated_at": internal.get("updated_at"),
         }

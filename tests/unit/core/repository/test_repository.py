@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import List
 from unittest import mock
 from uuid import uuid4
@@ -13,7 +12,6 @@ from src.core.repository.base.repository import Repository
 from src.core.repository.in_memory.in_memory_gateway import InMemoryGateway
 
 
-@dataclass(frozen=True)
 class User(RootEntity):
     name: str
 

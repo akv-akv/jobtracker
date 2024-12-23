@@ -1,15 +1,15 @@
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from unittest import mock
 from uuid import UUID, uuid4
 
 import pytest
+from pydantic import ValidationError
 
 from src.core.domain.root_entity import RootEntity
 
-
 # Example entity extending RootEntity
-@dataclass(frozen=True)
+
+
 class User(RootEntity):
     name: str
 
@@ -49,10 +49,10 @@ def test_create_with_id():
 
 
 def test_create_with_wrong_type_id():
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(ValidationError) as e:
         User.create(id=1, name="piet")
 
-    assert "Invalid type for field" in str(e.value)
+    assert "UUID input should be a string, bytes or UUID object" in str(e.value)
 
 
 def test_update(user, patched_now):
@@ -92,15 +92,29 @@ def test_equality():
 
 
 @pytest.mark.parametrize(
-    "invalid_field,value,e",
+    "invalid_field,value,expected_exception,expected_message",
     [
-        ("created_at", "not-a-datetime", Exception),
-        ("updated_at", "not-a-datetime", TypeError),
+        (
+            "created_at",
+            "not-a-datetime",
+            ValueError,
+            "Cannot change the created_at timestamp",
+        ),
+        (
+            "updated_at",
+            "not-a-datetime",
+            ValidationError,
+            "Input should be a valid datetime or date",
+        ),
     ],
 )
-def test_invalid_dates(user, invalid_field, value, e):
-    with pytest.raises(e):
+def test_invalid_dates(
+    user, invalid_field, value, expected_exception, expected_message
+):
+    with pytest.raises(expected_exception) as e:
         user.update(**{invalid_field: value})
+
+    assert expected_message in str(e.value)
 
 
 # Entity with UUID as ID

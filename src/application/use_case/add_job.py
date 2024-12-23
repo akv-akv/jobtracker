@@ -24,7 +24,6 @@ async def add_job(data: dict, manager: Manage):
     try:
         # Add the job to the repository
         response = await manager.create(request.data)
-        # print(request.data)
 
         # Return a success response with the created job
         return ResponseSuccess(response)

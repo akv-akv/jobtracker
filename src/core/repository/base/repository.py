@@ -61,12 +61,9 @@ class Repository(Generic[T]):
         return self.entity(**res)
 
     async def add(self, item: T | dict[str, Any]) -> T:
-        # Add a new record to the database
         if isinstance(item, dict):
-            item = self.entity.create(**item)  # Convert dict to entity
-        created = await self.gateway.add(
-            vars(item)
-        )  # Use vars() to dump entity to dict
+            item = self.entity.create(**item)
+        created = await self.gateway.add(dict(vars(item)))  # Explicitly cast to dict
         return self.entity(**created)
 
     async def update(
@@ -83,17 +80,17 @@ class Repository(Generic[T]):
                     "Can't use optimistic locking on object without updated_at datetime"
                 )
             updated = await self.gateway.update(
-                vars(existing.update(**values)), if_unmodified_since=updated_at
+                dict(vars(existing.update(**values))), if_unmodified_since=updated_at
             )
         else:
             updated = await self.gateway.update_transactional(
-                id, lambda x: vars(self.entity(**x).update(**values))
+                id, lambda x: dict(vars(self.entity(**x).update(**values)))
             )
         return self.entity(**updated)
 
     async def upsert(self, item: T) -> T:
         # Insert or update a record
-        values = vars(item)  # Convert entity to dict
+        values = dict(vars(item))
         upserted = await self.gateway.upsert(values)
         return self.entity(**upserted)
 

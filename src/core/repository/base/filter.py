@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from uuid import UUID
@@ -6,7 +5,6 @@ from uuid import UUID
 from src.core.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True)
 class Filter(ValueObject):
     field: str
     values: list[Any]
@@ -25,7 +23,6 @@ class ComparisonOperator(str, Enum):
     NE = "ne"
 
 
-@dataclass(frozen=True)
 class ComparisonFilter(Filter):
     operator: ComparisonOperator
 

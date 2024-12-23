@@ -1,10 +1,11 @@
 from __future__ import annotations  # For Python 3.8-3.9 compatibility with annotations
 
 import uuid
-from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from typing import Type, TypeVar
 from uuid import UUID
+
+from pydantic import Field
 
 from src.core.domain.value_object import ValueObject
 
@@ -15,7 +16,6 @@ def now():
     return datetime.now(timezone.utc)
 
 
-@dataclass(frozen=True)
 class RootEntity(ValueObject):
     """
     Types that have an identity.
@@ -25,9 +25,9 @@ class RootEntity(ValueObject):
     associated with state changes (created_at, updated_at).
     """
 
-    id: UUID
-    created_at: datetime
-    updated_at: datetime
+    id: UUID = Field(default_factory=uuid.uuid4)
+    created_at: datetime = Field(default_factory=now)
+    updated_at: datetime = Field(default_factory=now)
 
     @classmethod
     def create(cls: Type[T], **values) -> T:
@@ -35,30 +35,26 @@ class RootEntity(ValueObject):
         Factory method to create a new instance of the entity.
         Ensures defaults for `id`, `created_at`, and `updated_at`.
         """
-        if "id" not in values or values["id"] is None:
-            values["id"] = uuid.uuid4()
+        values.setdefault("id", uuid.uuid4())
         values.setdefault("created_at", now())
         values.setdefault("updated_at", values["created_at"])
-        cls._validate_types(values)
-        return cls(**values)
+        return super().create(**values)
 
     def update(self: T, **values) -> T:
         """
         Updates the entity with new values.
         Enforces immutability by returning a new instance.
         """
-        if "id" in values and self.id is not None and values["id"] != self.id:
-            raise Exception("Cannot change the id of an entity")
+        if "id" in values and values["id"] != self.id:
+            raise ValueError("Cannot change the id of an entity")
         if "created_at" in values:
-            raise Exception("Cannot change the created_at timestamp")
+            raise ValueError("Cannot change the created_at timestamp")
         values.setdefault("updated_at", now())
-        self._validate_types(values)
-        return replace(self, **values)
+        return super().update(**values)
 
     def __hash__(self):
         """
         Custom hash function to ensure the entity
         can be used in sets or as a dictionary key.
         """
-        assert self.id is not None, "id must be set before hashing"
         return hash(self.__class__) + hash(self.id)

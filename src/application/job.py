@@ -6,7 +6,12 @@ from sqlalchemy import Column, DateTime, Enum, ForeignKey, MetaData, String, Tab
 from sqlalchemy.dialects.postgresql import UUID
 
 from manage import get_database_url
-from src.application.domain.entity.job import Job
+from src.application.domain.entity.job import (
+    EmploymentType,
+    Job,
+    JobStatus,
+    WorkSettingType,
+)
 from src.application.domain.enums.country import Country
 from src.application.user import manage_user
 from src.core.manage import Manage
@@ -26,11 +31,11 @@ job_table = Table(
     Column("title", String, nullable=False),
     Column("company", String, nullable=False),
     Column("description", Text, nullable=False),
-    Column("country", Enum(Country)),  # Store ISO code as string
+    Column("country", Enum(Country)),
     Column("city", String, nullable=False),
-    Column("work_setting_type", String, nullable=True),  # Store Enum as string
-    Column("status", String, nullable=False),  # Store Enum as string
-    Column("employment_type", String, nullable=True),  # Store Enum as string
+    Column("work_setting_type", Enum(WorkSettingType), nullable=True),
+    Column("status", Enum(JobStatus), nullable=False),
+    Column("employment_type", Enum(EmploymentType), nullable=True),
     Column("notes", Text, nullable=True),
     Column("external_id", String, nullable=True),
     Column("platform", String, nullable=True),
@@ -74,11 +79,13 @@ class JobMapper(Mapper):
                 "city": external.get("city"),
                 "work_setting_type": external.get("work_setting_type"),
                 "status": external.get("status"),
-                # "employment_type": external.get("employment_type"),
-                # "notes": external.get("notes"),
-                # "external_id": external.get("external_id"),
-                # "platform": external.get("platform"),
-                # "url": external.get("url"),
+                "employment_type": EmploymentType(
+                    external.get("employment_type").value
+                ),
+                "notes": external.get("notes"),
+                "external_id": external.get("external_id"),
+                "platform": external.get("platform"),
+                "url": external.get("url"),
                 "created_at": external.get("created_at"),
                 "updated_at": external.get("updated_at"),
             }
