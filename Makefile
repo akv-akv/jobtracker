@@ -38,3 +38,6 @@ alembic-downgrade:
 	POSTGRES_HOSTNAME=localhost \
 	APPLICATION_DB=jobtracker \
 	$(VENV)/bin/alembic downgrade -1
+
+delete-all-jobs:
+	./cli.py list-jobs | grep -oE "[a-f0-9-]{36}" | xargs -I {} ./cli.py delete-job -- {}

@@ -61,9 +61,11 @@ async def add_user(
 @app.command()
 @typer_async
 async def add_job(
-    user_id: str = typer.Argument(..., help="User ID who owns the job."),
     title: str = typer.Argument(..., help="Title of the job."),
     company: str = typer.Argument(..., help="Company offering the job."),
+    user_id: str = typer.Option(
+        "be2ffb22-4b5b-4875-8b9a-06eb02d24421", help="User ID who owns the job."
+    ),
     status: JobStatus = typer.Option(JobStatus.ADDED.value, help="Job status."),
     country: str = typer.Option(
         Country.UnitedArabEmirates.name, help="Country of the job."
