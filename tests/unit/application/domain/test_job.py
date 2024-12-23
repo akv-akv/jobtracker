@@ -9,16 +9,7 @@ from src.application.domain.entity.job import (
     JobStatus,
     WorkSettingType,
 )
-from src.application.domain.entity.user import User
 from src.application.domain.enums.country import Country
-
-
-@composite
-def user_strategy(draw):
-    """Hypothesis strategy to generate User instances."""
-    return User.create(
-        name=draw(st.text(min_size=1, max_size=50)),
-    )
 
 
 @composite
@@ -31,7 +22,7 @@ def country_strategy(draw):
 def job_strategy(draw):
     """Hypothesis strategy to generate Job instances."""
     return Job.create(
-        user=draw(user_strategy()),
+        user_id=draw(st.uuids(version=4)),
         title=draw(st.text(min_size=1, max_size=100)),
         company=draw(st.text(min_size=1, max_size=100)),
         description=draw(st.text(min_size=1, max_size=2500)),
@@ -52,7 +43,7 @@ def test_job_init(job):
     """Test Job initialization with Hypothesis."""
     assert isinstance(job, Job)
     assert isinstance(job.id, UUID)
-    assert isinstance(job.user, User)
+    assert isinstance(job.user_id, UUID)
     assert isinstance(job.country, Country)
     assert len(job.title) > 0
     assert job.status in JobStatus

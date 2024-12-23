@@ -3,7 +3,6 @@ from uuid import uuid4
 import pytest
 
 from src.application.domain.entity.job import JobStatus, WorkSettingType
-from src.application.domain.entity.user import User
 from src.application.domain.enums.country import Country
 from src.application.use_case.list_jobs import list_jobs
 from src.core.responses.response import ResponseTypes
@@ -15,7 +14,7 @@ async def job_manager_with_jobs(job_manager):
     jobs = [
         {
             "id": uuid4(),
-            "user": User.create(name="Kirill"),
+            "user_id": uuid4(),
             "title": "Software Engineer",
             "company": "TechCorp",
             "status": JobStatus.APPLIED,
@@ -26,7 +25,7 @@ async def job_manager_with_jobs(job_manager):
         },
         {
             "id": uuid4(),
-            "user": User.create(name="Kirill"),
+            "user_id": uuid4(),
             "title": "Product Manager",
             "company": "BizCorp",
             "status": JobStatus.INTERVIEWING,
@@ -37,7 +36,7 @@ async def job_manager_with_jobs(job_manager):
         },
         {
             "id": uuid4(),
-            "user": User.create(name="Kirill"),
+            "user_id": uuid4(),
             "title": "Data Scientist",
             "company": "DataCorp",
             "status": JobStatus.REJECTED,

@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from src.application.domain.entity.job import JobStatus, WorkSettingType
-from src.application.domain.entity.user import User
 from src.application.domain.enums.country import Country
 from src.application.use_case.add_job import add_job
 from src.core.responses.response import ResponseTypes
@@ -11,7 +10,7 @@ async def test_add_job_success(job_manager):
     """Test adding a job successfully."""
     data = {
         "id": uuid4(),
-        "user": User.create(name="Kirill"),
+        "user_id": uuid4(),
         "title": "Software Engineer",
         "company": "TechCorp",
         "status": "applied",
@@ -42,7 +41,7 @@ async def test_add_job_duplicate_id(job_manager):
     """Test adding a job with a duplicate ID."""
     data = {
         "id": uuid4(),
-        "user": User.create(name="Kirill"),
+        "user_id": uuid4(),
         "title": "Software Engineer",
         "company": "TechCorp",
         "status": JobStatus.APPLIED,

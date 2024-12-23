@@ -6,22 +6,32 @@ from uuid import UUID
 
 import typer
 
+from manage import get_database_url
 from src.application.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
-from src.application.job import manage_job
+from src.application.infrastructure.repository.job import JobRepository
+from src.application.infrastructure.repository.user import UserRepository
+from src.application.infrastructure.sql.gateways.job import JobSQLGateway
+from src.application.infrastructure.sql.gateways.user import UserSQLGateway
+from src.application.manage.job import ManageJob
+from src.application.manage.user import ManageUser
 from src.application.use_case.add_job import add_job as add_job_use_case
-from src.application.user import manage_user
 from src.core.repository.base.pagination import PageOptions
+from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.core.responses.response import ResponseTypes
 
 # from src.application.use_case.delete_job import delete_job as delete_job_use_case
 # from src.application.use_case.list_jobs import list_jobs as list_jobs_use_case
 # from src.application.use_case.update_job import update_job as update_job_use_case
 
-# from src.core.repository.job_postgres import JobRepositoryPostgres
-
-
 app = typer.Typer(help="Job Tracker CLI Tool")
+
+db = AsyncpgSQLDatabase(get_database_url("production"))
+
+job_gateway = JobSQLGateway(db)
+manage_job = ManageJob(JobRepository(job_gateway))
+user_gateway = UserSQLGateway(db)
+manage_user = ManageUser(UserRepository(user_gateway))
 
 
 def typer_async(f):
@@ -55,8 +65,8 @@ async def add_job(
     title: str = typer.Argument(..., help="Title of the job."),
     company: str = typer.Argument(..., help="Company offering the job."),
     status: JobStatus = typer.Option(JobStatus.ADDED.value, help="Job status."),
-    country: Country = typer.Option(
-        Country.UnitedArabEmirates.value, help="Country of the job."
+    country: str = typer.Option(
+        Country.UnitedArabEmirates.name, help="Country of the job."
     ),
     city: str = typer.Option("Remote", help="City of the job."),
     work_setting_type: Optional[WorkSettingType] = typer.Option(
@@ -94,7 +104,7 @@ async def add_job(
 
     # Prepare job data
     data = {
-        "user": user,
+        "user_id": user_id,
         "title": title,
         "company": company,
         "description": description.strip(),
@@ -237,8 +247,6 @@ async def update_job(
     data = {k: v for k, v in data.items() if v is not None}
 
     response = await manage_job.update(UUID(job_id), data)
-    print(response)
-
     if response:
         (f"Job '{job_id}' updated successfully.")
     else:

@@ -13,7 +13,6 @@ async def list_jobs(
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
     try:
-        print(request.params)
         jobs = await job_manager.filter(filters=request.filters, params=request.params)
         return ResponseSuccess(jobs)
     except Exception as exc:

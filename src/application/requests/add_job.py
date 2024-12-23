@@ -40,7 +40,7 @@ def build_add_job_request(
         return invalid_req
 
     required_fields = [
-        "user",
+        "user_id",
         "title",
         "company",
         "description",

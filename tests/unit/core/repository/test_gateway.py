@@ -60,7 +60,7 @@ async def test_add(in_memory_gateway):
     id = uuid4()
     record = {"id": id, "name": "d"}
     await in_memory_gateway.add(record)
-    print(in_memory_gateway.data)
+    # print(in_memory_gateway.data)
     assert in_memory_gateway.data[id] == record
 
 

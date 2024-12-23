@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
+from uuid import UUID
 
-from src.application.domain.entity.user import User
 from src.application.domain.enums.country import Country
 from src.core.domain.root_entity import RootEntity
 
@@ -34,7 +34,7 @@ class WorkSettingType(Enum):
 
 
 class Job(RootEntity):
-    user: User
+    user_id: UUID
     title: str
     company: str
     description: str

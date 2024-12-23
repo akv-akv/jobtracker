@@ -4,8 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from src.application.job import metadata as job_metadata
-from src.application.user import metadata as user_metadata
+from src.application.infrastructure.sql.models.metadata import metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -34,7 +33,7 @@ if config.config_file_name is not None:
 # target_metadata = None
 
 
-target_metadata = [job_metadata, user_metadata]
+target_metadata = metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
