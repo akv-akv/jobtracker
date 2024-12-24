@@ -79,6 +79,11 @@ application:
             - user_id: UUID (foreign key to User.id)
             - template_id: UUID (foreign key to ResumeTemplate.id)
             - created_at: datetime
+      - Experience:
+          fields:
+            - id: UUID
+            - user_id: UUID
+            -
       - ResumeTemplate:
           fields:
             - id: UUID
@@ -151,25 +156,3 @@ application:
       job_analyser:
         - analyse_job_success_chances (given skillhistory, resumeversion, job)
         - generate_cover_letter (for job, resumeversion)
-  implementation_phases:
-    - phase_1:
-      goal:
-        - Phase 1 architecture diagram
-        - User entity (tested)
-        - User use_cases (tested)
-        - User repo memory
-        - Job entity (tested)
-        - Job use_cases (tested)
-        - Job repo postgres
-        - Requests
-        - Responses
-        - REST API
-        - Frontend MVP
-        - Web application that has user management, and job management functionality
-      done:
-        -
-    - phase_2
-    - phase_3
-    - phase_4
-    - phase_5
-    - phase_6

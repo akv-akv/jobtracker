@@ -58,8 +58,8 @@ def job_mapper():
         # Missing optional fields
         (
             {
-                "id": "40f478ce-1128-4eaa-b9c3-0f0d5e0bb789",
-                "user_id": "d265a881-0530-4dae-b3d8-dd5d4f6a55a6",
+                "id": UUID("40f478ce-1128-4eaa-b9c3-0f0d5e0bb789"),
+                "user_id": UUID("d265a881-0530-4dae-b3d8-dd5d4f6a55a6"),
                 "title": "Data Engineer",
                 "company": "Tech Co",
                 "description": "Job Description",

@@ -28,7 +28,7 @@ class ValueObject(BaseModel):
         Performs validation on the updated values.
         """
         # Merge the current instance's data with the updates
-        updated_data = {**self.dict(), **values}
+        updated_data = {**self.model_dump(), **values}
         # Validate and create a new instance
         return self.__class__(**updated_data)
 
