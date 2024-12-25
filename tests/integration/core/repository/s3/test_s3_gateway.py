@@ -15,6 +15,8 @@ from src.core.repository.s3.s3_provider import S3BucketOptions, S3BucketProvider
 # from datetime import datetime
 # from unittest import mock
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture(scope="session")
 async def s3_url():
@@ -88,18 +90,18 @@ async def test_upload_file(s3_gateway: S3Gateway, local_file):
     assert (await s3_gateway.get(object_name))["size"] == 3
 
 
-# async def test_upload_file_does_not_exist(s3_gateway: S3Gateway, tmp_path):
-#     path = tmp_path / "test-upload.txt"
-#     object_name = "test-upload-file"
+async def test_upload_file_does_not_exist(s3_gateway: S3Gateway, tmp_path):
+    path = tmp_path / "test-upload.txt"
+    object_name = "test-upload-file"
 
-#     with pytest.raises(FileNotFoundError):
-#         await s3_gateway.upload_file(object_name, path)
+    with pytest.raises(FileNotFoundError):
+        await s3_gateway.upload_file(object_name, path)
 
 
-async def test_download_file(s3_gateway: S3Gateway, object_in_s3, tmp_path):
+async def test_download_file(s3_gateway: S3Gateway, local_file, tmp_path):
     path = tmp_path / "test-download.txt"
-
-    await s3_gateway.download_file(object_in_s3, path)
+    await s3_gateway.upload_file("test-download-file", local_file)
+    await s3_gateway.download_file("test-download-file", path)
 
     assert path.read_bytes() == b"foo"
 
@@ -109,9 +111,10 @@ async def test_download_file(s3_gateway: S3Gateway, object_in_s3, tmp_path):
 # ):
 #     path = tmp_path / "test-download.txt"
 #     path.write_bytes(b"bar")
-
+#     await s3_gateway.upload_file("test-download-file-path-already-exists", local_file)
+#     print("file uploaded")
 #     with pytest.raises(FileExistsError):
-#         await s3_gateway.download_file(object_in_s3, path)
+#         await s3_gateway.download_file("test-download-file-path-already-exists", path)
 
 #     assert path.read_bytes() == b"bar"
 
@@ -126,7 +129,7 @@ async def test_download_file(s3_gateway: S3Gateway, object_in_s3, tmp_path):
 #     assert not path.exists()
 
 
-# async def test_remove(s3_gateway: S3Gateway, s3_bucket, object_in_s3):
+# async def test_remove(s3_gateway: S3Gateway, object_in_s3):
 #     await s3_gateway.remove(object_in_s3)
 
 #     assert await s3_gateway.get(object_in_s3) is None
