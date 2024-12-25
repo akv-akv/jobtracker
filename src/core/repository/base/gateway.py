@@ -20,7 +20,7 @@ class Gateway(ABC):
         pass
 
     @abstractmethod
-    async def remove(self, id: UUID) -> bool:
+    async def remove(self, id: Any) -> bool:
         pass
 
     @abstractmethod
@@ -29,7 +29,7 @@ class Gateway(ABC):
     ) -> list[dict[str, Any]]:
         pass
 
-    async def get(self, id: UUID) -> dict[str, Any] | None:
+    async def get(self, id: Any) -> dict[str, Any] | None:
         result = await self.filter([Filter(field="id", values=[id])], params=None)
         return result[0] if result else None
 

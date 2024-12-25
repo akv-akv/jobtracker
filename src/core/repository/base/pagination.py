@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Generic, TypeVar
 
 T = TypeVar("T")
@@ -10,9 +9,9 @@ T = TypeVar("T")
 class PageOptions:
     limit: int = 10
     offset: int = 0
-    order_by: str = "created_at"
+    order_by: str = "id"
     ascending: bool = True
-    cursor: datetime | None = None
+    cursor: str | None = None
 
 
 @dataclass

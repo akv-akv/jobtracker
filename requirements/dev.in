@@ -10,3 +10,4 @@ mypy
 pdbpp
 pre-commit
 ruff
+types-aioboto3[s3]

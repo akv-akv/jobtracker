@@ -1,7 +1,10 @@
+aioboto3==13.1.*
+aiobotocore
 alembic
 async-lru
 asyncpg
 backoff
+boto3
 greenlet
 inject
 psycopg2-binary

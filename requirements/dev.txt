@@ -4,6 +4,22 @@
 #
 #    pip-compile requirements/dev.in
 #
+aioboto3==13.1.1
+    # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
+aiobotocore[boto3]==2.13.1
+    # via
+    #   -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
+    #   aioboto3
+aiofiles==24.1.0
+    # via aioboto3
+aiohappyeyeballs==2.4.4
+    # via aiohttp
+aiohttp==3.11.11
+    # via aiobotocore
+aioitertools==0.12.0
+    # via aiobotocore
+aiosignal==1.3.2
+    # via aiohttp
 alembic==1.14.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 annotated-types==0.7.0
@@ -16,6 +32,7 @@ asyncpg==0.30.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 attrs==24.3.0
     # via
+    #   aiohttp
     #   flake8-bugbear
     #   hypothesis
     #   wmctrl
@@ -23,13 +40,26 @@ backoff==2.2.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 black==24.10.0
     # via -r requirements/dev.in
+boto3==1.34.131
+    # via
+    #   -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
+    #   aiobotocore
+botocore==1.34.131
+    # via
+    #   aiobotocore
+    #   boto3
+    #   s3transfer
+botocore-stubs==1.35.87
+    # via
+    #   types-aioboto3
+    #   types-aiobotocore
 cachetools==5.5.0
     # via tox
 cfgv==3.4.0
     # via pre-commit
 chardet==5.2.0
     # via tox
-click==8.1.7
+click==8.1.8
     # via
     #   black
     #   typer
@@ -65,22 +95,32 @@ flake8-comprehensions==3.16.0
     # via -r requirements/dev.in
 flake8-docstrings==1.7.0
     # via -r requirements/dev.in
+frozenlist==1.5.0
+    # via
+    #   aiohttp
+    #   aiosignal
 greenlet==3.1.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
-hypothesis==6.122.4
+hypothesis==6.123.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 identify==2.6.3
     # via pre-commit
+idna==3.10
+    # via yarl
 iniconfig==2.0.0
     # via pytest
 inject==5.2.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
-ipython==8.30.0
+ipython==8.31.0
     # via -r requirements/dev.in
 isort==5.13.2
     # via -r requirements/dev.in
 jedi==0.19.2
     # via ipython
+jmespath==1.0.1
+    # via
+    #   boto3
+    #   botocore
 mako==1.3.8
     # via alembic
 markdown-it-py==3.0.0
@@ -93,7 +133,11 @@ mccabe==0.7.0
     # via flake8
 mdurl==0.1.2
     # via markdown-it-py
-mypy==1.13.0
+multidict==6.1.0
+    # via
+    #   aiohttp
+    #   yarl
+mypy==1.14.0
     # via -r requirements/dev.in
 mypy-extensions==1.0.0
     # via
@@ -128,6 +172,10 @@ pre-commit==4.0.1
     # via -r requirements/dev.in
 prompt-toolkit==3.0.48
     # via ipython
+propcache==0.2.1
+    # via
+    #   aiohttp
+    #   yarl
 psycopg2-binary==2.9.10
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
 ptyprocess==0.7.0
@@ -168,14 +216,20 @@ pytest-mock==3.14.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-xdist==3.6.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
+python-dateutil==2.9.0.post0
+    # via botocore
 pyyaml==6.0.2
     # via pre-commit
 rich==13.9.4
     # via typer
 ruff==0.8.4
     # via -r requirements/dev.in
+s3transfer==0.10.4
+    # via boto3
 shellingham==1.5.4
     # via typer
+six==1.17.0
+    # via python-dateutil
 snowballstemmer==2.2.0
     # via pydocstyle
 sortedcontainers==2.4.0
@@ -194,6 +248,16 @@ traitlets==5.14.3
     #   matplotlib-inline
 typer==0.15.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/prod.txt
+types-aioboto3[s3]==13.2.0.post3
+    # via -r requirements/dev.in
+types-aiobotocore==2.16.0
+    # via types-aioboto3
+types-aiobotocore-s3==2.16.0
+    # via types-aioboto3
+types-awscrt==0.23.6
+    # via botocore-stubs
+types-s3transfer==0.10.4
+    # via types-aioboto3
 typing-extensions==4.12.2
     # via
     #   alembic
@@ -202,6 +266,8 @@ typing-extensions==4.12.2
     #   pydantic-core
     #   sqlalchemy
     #   typer
+urllib3==2.3.0
+    # via botocore
 virtualenv==20.28.0
     # via
     #   pre-commit
@@ -210,3 +276,7 @@ wcwidth==0.2.13
     # via prompt-toolkit
 wmctrl==0.5
     # via pdbpp
+wrapt==1.17.0
+    # via aiobotocore
+yarl==1.18.3
+    # via aiohttp
