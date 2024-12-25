@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from src.application.domain.entity.job import JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
-from src.application.requests.add_job import build_add_job_request
+from src.application.requests.job.add_job import build_add_job_request
 
 
 def test_build_add_job_request_empty_data():

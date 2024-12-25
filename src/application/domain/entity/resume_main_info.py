@@ -1,15 +1,14 @@
 from typing import List, Optional
 from uuid import UUID
 
-from src.core.domain.versioned_root_entity import VersionedRootEntity
+from src.core.domain.root_entity import RootEntity
 
 
-class ResumeMainInfo(VersionedRootEntity):
+class ResumeMainInfo(RootEntity):
     user_id: UUID
-    title: str
     applicant_name: str
-    summary: Optional[str] = None
     skills: List[str] = []
+    summary: Optional[str] = None
     location: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None

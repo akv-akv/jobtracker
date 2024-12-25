@@ -1,4 +1,4 @@
-from src.application.requests.update_job import (
+from src.application.requests.job.update_job import (
     UpdateJobInvalidRequest,
     build_update_job_request,
 )

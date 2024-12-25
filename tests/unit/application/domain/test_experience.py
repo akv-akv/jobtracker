@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from src.application.domain.entity.experience import Experience
-from src.core.domain.versioned_root_entity import VersionedRootEntity
+from src.core.domain.root_entity import RootEntity
 
 
 def test_create_experience():
@@ -22,7 +22,7 @@ def test_create_experience():
     }
     obj = Experience.create(**data)
     assert isinstance(obj, Experience)
-    assert issubclass(Experience, VersionedRootEntity)
+    assert issubclass(Experience, RootEntity)
     assert isinstance(obj.user_id, UUID)
     assert isinstance(obj.bullet_points, list)
     assert len(obj.bullet_points) == 2

@@ -1,4 +1,4 @@
-from src.application.requests.delete_job import (
+from src.application.requests.job.delete_job import (
     DeleteJobInvalidRequest,
     build_delete_job_request,
 )

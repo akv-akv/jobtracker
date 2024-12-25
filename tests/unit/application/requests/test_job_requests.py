@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.application.requests.list_jobs import build_job_list_request
+from src.application.requests.job.list_jobs import build_job_list_request
 from src.core.repository.base.filter import ComparisonFilter, ComparisonOperator, Filter
 
 

@@ -4,7 +4,7 @@ import pytest
 
 from src.application.domain.entity.job import JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
-from src.application.use_case.list_jobs import list_jobs
+from src.application.use_case.job.list_jobs import list_jobs
 from src.core.responses.response import ResponseTypes
 
 

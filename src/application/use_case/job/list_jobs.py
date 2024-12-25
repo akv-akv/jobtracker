@@ -1,6 +1,9 @@
 from typing import Any, Optional
 
-from src.application.requests.list_jobs import InvalidRequest, build_job_list_request
+from src.application.requests.job.list_jobs import (
+    InvalidRequest,
+    build_job_list_request,
+)
 from src.core.manage import Manage
 from src.core.responses.response import ResponseFailure, ResponseSuccess, ResponseTypes
 

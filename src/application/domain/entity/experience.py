@@ -2,10 +2,10 @@ from datetime import date
 from typing import List, Optional
 from uuid import UUID
 
-from src.core.domain.versioned_root_entity import VersionedRootEntity
+from src.core.domain.root_entity import RootEntity
 
 
-class Experience(VersionedRootEntity):
+class Experience(RootEntity):
     user_id: UUID
     job_title: str
     company_name: str

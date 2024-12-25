@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from src.application.domain.entity.job import JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
-from src.application.use_case.add_job import add_job
+from src.application.use_case.job.add_job import add_job
 from src.core.responses.response import ResponseTypes
 
 

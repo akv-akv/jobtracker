@@ -10,12 +10,25 @@ from manage import get_database_url
 from src.application.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
 from src.application.infrastructure.repository.job import JobRepository
+from src.application.infrastructure.repository.resume_main_info import (
+    ResumeMainInfoRepository,
+)
 from src.application.infrastructure.repository.user import UserRepository
 from src.application.infrastructure.sql.gateways.job import JobSQLGateway
+from src.application.infrastructure.sql.gateways.resume_main_info import (
+    ResumeMainInfoSQLGateway,
+)
 from src.application.infrastructure.sql.gateways.user import UserSQLGateway
 from src.application.manage.job import ManageJob
+from src.application.manage.resume_main_info import ManageResumeMainInfo
 from src.application.manage.user import ManageUser
-from src.application.use_case.add_job import add_job as add_job_use_case
+from src.application.use_case.job.add_job import add_job as add_job_use_case
+from src.application.use_case.resume_main_info.add_resume_main_info import (
+    add_resume_main_info as add_resume_main_info_use_case,
+)
+from src.application.use_case.resume_main_info.update_resume_main_info import (
+    update_resume_main_info_use_case,
+)
 from src.core.repository.base.pagination import PageOptions
 from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.core.responses.response import ResponseTypes
@@ -32,6 +45,10 @@ job_gateway = JobSQLGateway(db)
 manage_job = ManageJob(JobRepository(job_gateway))
 user_gateway = UserSQLGateway(db)
 manage_user = ManageUser(UserRepository(user_gateway))
+resume_main_info_gateway = ResumeMainInfoSQLGateway(db)
+manage_resume_main_info = ManageResumeMainInfo(
+    ResumeMainInfoRepository(resume_main_info_gateway)
+)
 
 
 def typer_async(f):
@@ -253,6 +270,60 @@ async def update_job(
         (f"Job '{job_id}' updated successfully.")
     else:
         typer.echo("Error: ")
+
+
+@app.command()
+@typer_async
+async def add_resume_main_info(
+    applicant_name: str = typer.Argument(..., help="Applicant name."),
+    skills: str = typer.Argument(..., help="List of skills separated by comma."),
+    user_id: str = typer.Option(
+        "be2ffb22-4b5b-4875-8b9a-06eb02d24421", help="User ID who owns the job."
+    ),
+):
+    """Add a new resume main info."""
+    user = await manage_user.retrieve(UUID(user_id))
+    if not user:
+        typer.echo(f"Error: User with ID {user_id} not found.")
+        return
+
+    # Prepare job data
+    data = {
+        "user_id": user.id,
+        "applicant_name": applicant_name,
+        "skills": skills.split(","),
+    }
+    print(data)
+    response = await add_resume_main_info_use_case(data, manage_resume_main_info)
+    # print(response.message)
+    if response.type == ResponseTypes.SUCCESS:
+        typer.echo(f"Resume main info added successfully (id = {response.value.id}).")
+    else:
+        typer.echo(f"Job creation failed: {response.value}")
+
+
+@app.command()
+@typer_async
+async def update_resume_main_info(
+    resume_main_info_id: UUID = typer.Argument(
+        ..., help="ID of the resume_main_info to update."
+    ),
+    resume_name: str = typer.Option(None, help="New resume_name"),
+):
+    """Update an existing job."""
+    data = {
+        "id": resume_main_info_id,
+        "resume_name": resume_name,
+    }
+    data = {k: v for k, v in data.items() if v is not None}
+    response = await update_resume_main_info_use_case(
+        data, resume_main_info_manager=manage_resume_main_info
+    )
+    print(response)
+    if response.type == ResponseTypes.SUCCESS:
+        typer.echo(f"Resume main info updated successfully (id = {response.value.id}).")
+    else:
+        typer.echo(f"Resume update failed: {response.value}")
 
 
 if __name__ == "__main__":
