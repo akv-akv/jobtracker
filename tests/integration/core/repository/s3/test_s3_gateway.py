@@ -1,3 +1,4 @@
+import asyncio
 import io
 from datetime import datetime
 from unittest import mock
@@ -15,12 +16,19 @@ from src.core.repository.s3.s3_provider import S3BucketOptions, S3BucketProvider
 pytestmark = pytest.mark.integration
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
+def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="module")
 async def s3_url():
     return "http://0.0.0.0:9000"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def s3_settings(s3_url):
     minio_settings = {
         "url": s3_url,
@@ -34,7 +42,7 @@ def s3_settings(s3_url):
     return minio_settings.copy()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def s3_bucket(s3_settings):
     s3 = boto3.resource(
         "s3",
