@@ -52,7 +52,7 @@ def s3_bucket(s3_settings):
     return bucket
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def s3_provider(s3_bucket, s3_settings) -> S3BucketProvider:
     # wipe contents before each test
     s3_bucket.objects.all().delete()
@@ -62,7 +62,7 @@ async def s3_provider(s3_bucket, s3_settings) -> S3BucketProvider:
     await provider.disconnect()
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def s3_gateway(s3_provider) -> S3Gateway:
     return S3Gateway(s3_provider)
 
@@ -96,12 +96,12 @@ async def test_upload_file(s3_gateway: S3Gateway, local_file):
 #         await s3_gateway.upload_file(object_name, path)
 
 
-# async def test_download_file(s3_gateway: S3Gateway, object_in_s3, tmp_path):
-#     path = tmp_path / "test-download.txt"
+async def test_download_file(s3_gateway: S3Gateway, object_in_s3, tmp_path):
+    path = tmp_path / "test-download.txt"
 
-#     await s3_gateway.download_file(object_in_s3, path)
+    await s3_gateway.download_file(object_in_s3, path)
 
-#     assert path.read_bytes() == b"foo"
+    assert path.read_bytes() == b"foo"
 
 
 # async def test_download_file_path_already_exists(
