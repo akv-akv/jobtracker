@@ -207,12 +207,15 @@ pytest==8.3.4
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-mock
+    #   pytest-random-order
     #   pytest-xdist
 pytest-asyncio==0.25.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-cov==6.0.0
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-mock==3.14.0
+    # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
+pytest-random-order==1.1.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt
 pytest-xdist==3.6.1
     # via -r /Users/kirillavilenko/Documents/de/learning/clean_architecture/jobtracker/requirements/test.txt

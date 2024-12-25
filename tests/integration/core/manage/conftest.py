@@ -57,7 +57,7 @@ async def postgres_db_url(postgres_url) -> str:
     return f"{postgres_url}/{dbname}"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def event_loop():
     loop = asyncio.get_event_loop()
     yield loop

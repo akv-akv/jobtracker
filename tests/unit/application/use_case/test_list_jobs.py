@@ -67,7 +67,7 @@ async def test_list_jobs_success_without_filters(job_manager_with_jobs):
 
 async def test_list_jobs_success_with_limit(job_manager_with_jobs):
     """Test listing all jobs without filters."""
-    params = {"limit": 1}
+    params = {"limit": 1, "order_by": "title"}
     response = await list_jobs(
         filters=None, params=params, job_manager=job_manager_with_jobs
     )
@@ -75,13 +75,13 @@ async def test_list_jobs_success_with_limit(job_manager_with_jobs):
     assert response.value.total == 3
     assert len(response.value.items) == 1
     assert {job.title for job in response.value.items} == {
-        "Software Engineer",
+        "Data Scientist",
     }
 
 
 async def test_list_jobs_success_with_limit_and_offset(job_manager_with_jobs):
     """Test listing all jobs without filters."""
-    params = {"limit": 1, "offset": 1}
+    params = {"limit": 1, "offset": 1, "order_by": "title"}
     response = await list_jobs(
         filters=None, params=params, job_manager=job_manager_with_jobs
     )
