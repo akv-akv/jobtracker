@@ -22,5 +22,21 @@
   {
     "name": "APPLICATION_DB",
     "value": "jobtracker"
+  },
+  {
+    "name": "MINIO_ROOT_USER",
+    "value": "jobtracker"
+  },
+  {
+    "name": "MINIO_ROOT_PASSWORD",
+    "value": "jobtracker"
+  },
+  {
+    "name": "MINIO_SERVER_PORT",
+    "value": "9000"
+  },
+  {
+    "name": "MINIO_CONSOLE_PORT",
+    "value": "9001"
   }
 ]

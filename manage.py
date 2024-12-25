@@ -168,7 +168,7 @@ def test(args: list[str] = typer.Argument(..., help="Arguments to pass to pytest
     subprocess.call(cmdline)
 
     typer.echo("Waiting for Postgres to be ready...")
-    cmdline = docker_compose_cmdline("logs postgres")
+    cmdline = docker_compose_cmdline("logs postgres s3")
     wait_for_logs(cmdline, "ready to accept connections")
 
     # run_sql([f"CREATE DATABASE {os.getenv('APPLICATION_DB')}"])
