@@ -3,26 +3,26 @@ from typing import Any, Dict
 from src.core.base_request import InvalidRequest, ValidRequest
 
 
-class UpdateResumeMainInfoValidRequest(ValidRequest):
-    """Request for updating a main_info."""
+class UpdateResumeTemplateValidRequest(ValidRequest):
+    """Request for updating a template."""
 
     def __init__(self, data: Dict[str, Any]):
         self.data = data
 
 
-class UpdateResumeMainInfoInvalidRequest(InvalidRequest):
+class UpdateResumeTemplateInvalidRequest(InvalidRequest):
     pass
 
 
-def build_update_resume_main_info_request(data: Dict[str, Any]):
-    """Factory for creating UpdateResumeMainInfoRequest."""
+def build_update_resume_template_request(data: Dict[str, Any]):
+    """Factory for creating UpdateResumeTemplateRequest."""
     if not isinstance(data, dict):
-        invalid_req = UpdateResumeMainInfoInvalidRequest()
+        invalid_req = UpdateResumeTemplateInvalidRequest()
         invalid_req.add_error("data", "Must be a dictionary.")
         return invalid_req
 
-    required_fields = ["id"]
-    invalid_req = UpdateResumeMainInfoInvalidRequest()
+    required_fields = ["id", "resume_template"]
+    invalid_req = UpdateResumeTemplateInvalidRequest()
 
     for field in required_fields:
         if field not in data:
@@ -31,4 +31,4 @@ def build_update_resume_main_info_request(data: Dict[str, Any]):
     if invalid_req.has_errors():
         return invalid_req
 
-    return UpdateResumeMainInfoValidRequest(data)
+    return UpdateResumeTemplateValidRequest(data)

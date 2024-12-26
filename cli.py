@@ -1,26 +1,45 @@
 #! /usr/bin/env python
+# Standard Library Imports
 import asyncio
 from functools import wraps
-from typing import Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
 from uuid import UUID
 
+# Third-Party Imports
 import typer
 
+# Application Imports
 from manage import get_database_url
+
+# Job-related Imports
 from src.application.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
 from src.application.infrastructure.repository.job import JobRepository
+
+# Resume Main Info-related Imports
 from src.application.infrastructure.repository.resume_main_info import (
     ResumeMainInfoRepository,
 )
+from src.application.infrastructure.repository.resume_template import (
+    ResumeTemplateRepository,
+)
+
+# User-related Imports
 from src.application.infrastructure.repository.user import UserRepository
 from src.application.infrastructure.sql.gateways.job import JobSQLGateway
 from src.application.infrastructure.sql.gateways.resume_main_info import (
     ResumeMainInfoSQLGateway,
 )
+from src.application.infrastructure.sql.gateways.resume_template import (
+    ResumeTemplateSQLGateway,
+)
 from src.application.infrastructure.sql.gateways.user import UserSQLGateway
 from src.application.manage.job import ManageJob
 from src.application.manage.resume_main_info import ManageResumeMainInfo
+
+# Resume Template-related Imports
+from src.application.manage.resume_template import ManageResumeTemplate
 from src.application.manage.user import ManageUser
 from src.application.use_case.job.add_job import add_job as add_job_use_case
 from src.application.use_case.resume_main_info.add_resume_main_info import (
@@ -29,6 +48,14 @@ from src.application.use_case.resume_main_info.add_resume_main_info import (
 from src.application.use_case.resume_main_info.update_resume_main_info import (
     update_resume_main_info_use_case,
 )
+from src.application.use_case.resume_template.add_resume_template import (
+    add_resume_template as add_resume_template_use_case,
+)
+from src.application.use_case.resume_template.update_resume_template import (
+    update_resume_template_use_case,
+)
+
+# Core Imports
 from src.core.gateway.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.core.repository.base.pagination import PageOptions
 from src.core.responses.response import ResponseTypes
@@ -48,6 +75,10 @@ manage_user = ManageUser(UserRepository(user_gateway))
 resume_main_info_gateway = ResumeMainInfoSQLGateway(db)
 manage_resume_main_info = ManageResumeMainInfo(
     ResumeMainInfoRepository(resume_main_info_gateway)
+)
+resume_template_gateway = ResumeTemplateSQLGateway(db)
+manage_resume_template = ManageResumeTemplate(
+    ResumeTemplateRepository(resume_template_gateway)
 )
 
 
@@ -324,6 +355,69 @@ async def update_resume_main_info(
         typer.echo(f"Resume main info updated successfully (id = {response.value.id}).")
     else:
         typer.echo(f"Resume update failed: {response.value}")
+
+
+@app.command()
+@typer_async
+async def add_resume_template(
+    template_path: Path = typer.Option(
+        Path("./tmp/resume_template.tex"),
+        help="Path to the LaTeX template file (default: ./tmp/template.tex).",
+    ),
+):
+    """Add a new resume template."""
+
+    # Ensure the template path exists and is a file
+    if not template_path.exists() or not template_path.is_file():
+        typer.echo(
+            f"Error: Template file '{template_path}' "
+            "does not exist or is not a valid file."
+        )
+        raise typer.Exit(code=1)
+
+    try:
+        # Read template content
+        template_content = template_path.read_text(encoding="utf-8")
+    except Exception as e:
+        typer.echo(f"Error reading template file: {e}")
+        raise typer.Exit(code=1)
+
+    data = {
+        "resume_template": template_content,
+    }
+
+    response = await add_resume_template_use_case(data, manage_resume_template)
+
+    if response.type == ResponseTypes.SUCCESS:
+        typer.echo(f"Resume template added successfully (id = {response.value.id}).")
+    else:
+        typer.echo(f"Error: {response.value}")
+
+
+@app.command()
+@typer_async
+async def update_resume_template(
+    resume_template_id: UUID = typer.Argument(
+        ..., help="ID of the resume template to update."
+    ),
+    template_path: str = typer.Option(
+        Path("./tmp/resume_template.tex"),
+        help="Path to the updated LaTeX template file.",
+    ),
+):
+    data: Dict[str, Any] = {}
+    with open(template_path, "r") as file:
+        data["resume_template"] = file.read()
+
+    """Update an existing resume template."""
+    data["id"] = resume_template_id
+
+    response = await update_resume_template_use_case(data, manage_resume_template)
+
+    if response.type == ResponseTypes.SUCCESS:
+        typer.echo(f"Resume template updated successfully (id = {response.value.id}).")
+    else:
+        typer.echo(f"Error: {response.value}")
 
 
 if __name__ == "__main__":

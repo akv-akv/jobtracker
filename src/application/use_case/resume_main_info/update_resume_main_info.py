@@ -1,5 +1,5 @@
 from src.application.requests.resume_main_info.update_resume_main_info import (
-    UpdateJobInvalidRequest,
+    UpdateResumeMainInfoInvalidRequest,
     build_update_resume_main_info_request,
 )
 from src.core.manage import Manage
@@ -10,7 +10,7 @@ async def update_resume_main_info_use_case(data, resume_main_info_manager: Manag
     """Update only the specified fields of a resume_main_info."""
     # Build the request and validate it
     request = build_update_resume_main_info_request(data)
-    if isinstance(request, UpdateJobInvalidRequest):
+    if isinstance(request, UpdateResumeMainInfoInvalidRequest):
         return ResponseFailure(ResponseTypes.PARAMETERS_ERROR, request.errors)
 
     try:
