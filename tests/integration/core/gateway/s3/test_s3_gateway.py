@@ -8,10 +8,10 @@ import pytest
 from botocore.exceptions import ClientError
 
 from src.core.domain.exceptions import DoesNotExist
+from src.core.gateway.s3.s3_gateway import S3Gateway
+from src.core.gateway.s3.s3_provider import S3BucketOptions, S3BucketProvider
 from src.core.repository.base.filter import Filter
 from src.core.repository.base.pagination import PageOptions
-from src.core.repository.s3.s3_gateway import S3Gateway
-from src.core.repository.s3.s3_provider import S3BucketOptions, S3BucketProvider
 
 pytestmark = pytest.mark.integration
 
@@ -181,7 +181,7 @@ async def test_remove_filtered_prefix(s3_gateway: S3Gateway, multiple_objects):
         assert await s3_gateway.get(key) is None
 
 
-@mock.patch("src.core.repository.s3.s3_gateway.AWS_LIMIT", new=1)
+@mock.patch("src.core.gateway.s3.s3_gateway.AWS_LIMIT", new=1)
 async def test_remove_filtered_pagination(s3_gateway: S3Gateway, multiple_objects):
     await s3_gateway.remove_filtered([Filter(field="prefix", values=["raster-2/"])])
 

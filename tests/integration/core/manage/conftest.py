@@ -8,11 +8,11 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from src.application.domain.enums.country import Country
 from src.core.domain.root_entity import RootEntity
+from src.core.gateway.sql.asyncpg_sql_database import AsyncpgSQLDatabase
+from src.core.gateway.sql.sql_gateway import SQLGateway
 from src.core.manage import Manage
 from src.core.repository.base.mapper import Mapper
 from src.core.repository.base.repository import Repository
-from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.core.repository.sql.sql_gateway import SQLGateway
 
 test_model = Table(
     "test_model",

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 from sqlalchemy.sql import text
 
-from src.core.repository.sql.sql_provider import SQLDatabase, SQLProvider
+from src.core.gateway.sql.sql_provider import SQLDatabase, SQLProvider
 
 
 @pytest.fixture

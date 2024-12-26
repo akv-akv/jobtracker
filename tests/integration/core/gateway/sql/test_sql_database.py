@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy.sql import text
 
 from src.core.domain.exceptions import AlreadyExists, Conflict
-from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.core.repository.sql.sql_gateway import SQLDatabase
+from src.core.gateway.sql.asyncpg_sql_database import AsyncpgSQLDatabase
+from src.core.gateway.sql.sql_gateway import SQLDatabase
 
 from .conftest import count_query, insert_query, update_query
 

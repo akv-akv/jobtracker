@@ -7,10 +7,10 @@ from pydantic import AnyHttpUrl
 
 from src.core.domain.context import ctx
 from src.core.domain.exceptions import DoesNotExist
+from src.core.gateway.s3.s3_provider import S3BucketProvider
 from src.core.repository.base.filter import Filter
 from src.core.repository.base.gateway import Gateway
 from src.core.repository.base.pagination import PageOptions
-from src.core.repository.s3.s3_provider import S3BucketProvider
 
 DEFAULT_EXPIRY = 3600  # in seconds
 DEFAULT_TIMEOUT = 1.0

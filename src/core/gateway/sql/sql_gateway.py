@@ -9,12 +9,12 @@ from sqlalchemy import Table
 from sqlalchemy.sql import Executable
 
 from src.core.domain.exceptions import Conflict, DoesNotExist
+from src.core.gateway.sql.sql_builder import SQLBuilder
+from src.core.gateway.sql.sql_provider import SQLDatabase, SQLProvider
 from src.core.repository.base.filter import Filter
 from src.core.repository.base.gateway import Gateway
 from src.core.repository.base.mapper import Mapper
 from src.core.repository.base.pagination import PageOptions
-from src.core.repository.sql.sql_builder import SQLBuilder
-from src.core.repository.sql.sql_provider import SQLDatabase, SQLProvider
 
 T = TypeVar("T", bound="SQLGateway")
 

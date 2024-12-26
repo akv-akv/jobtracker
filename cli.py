@@ -29,8 +29,8 @@ from src.application.use_case.resume_main_info.add_resume_main_info import (
 from src.application.use_case.resume_main_info.update_resume_main_info import (
     update_resume_main_info_use_case,
 )
+from src.core.gateway.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.core.repository.base.pagination import PageOptions
-from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
 from src.core.responses.response import ResponseTypes
 
 # from src.application.use_case.delete_job import delete_job as delete_job_use_case

@@ -7,6 +7,7 @@ backoff
 boto3
 greenlet
 inject
+jinja2
 psycopg2-binary
 pydantic
 SQLAlchemy

@@ -5,9 +5,9 @@ from uuid import uuid4
 import pytest
 
 from src.core.domain.exceptions import AlreadyExists, DoesNotExist
+from src.core.gateway.in_memory.in_memory_gateway import InMemoryGateway
 from src.core.repository.base.filter import Filter
 from src.core.repository.base.pagination import PageOptions
-from src.core.repository.in_memory.in_memory_gateway import InMemoryGateway
 
 ids = [uuid4() for i in range(3)]
 

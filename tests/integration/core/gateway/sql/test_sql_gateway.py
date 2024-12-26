@@ -6,9 +6,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
 from src.core.domain.exceptions import AlreadyExists, Conflict, DoesNotExist
+from src.core.gateway.sql.asyncpg_sql_database import AsyncpgSQLDatabase
+from src.core.gateway.sql.sql_gateway import SQLDatabase, SQLGateway
 from src.core.repository.base.filter import Filter
-from src.core.repository.sql.asyncpg_sql_database import AsyncpgSQLDatabase
-from src.core.repository.sql.sql_gateway import SQLDatabase, SQLGateway
 
 from .conftest import test_model
 
