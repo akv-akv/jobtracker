@@ -1,13 +1,13 @@
 from typing import Any, Dict
 
-from jinja2 import Environment, StrictUndefined, Template
+from jinja2 import Environment, Template
 
 
 class JinjaProvider:
     """Jinja-based template rendering provider."""
 
-    def __init__(self):
-        self.environment = Environment(undefined=StrictUndefined)
+    def __init__(self, params):
+        self.environment = Environment(**params)
 
     def render(self, template: str, context: Dict[str, Any]) -> str:
         """Render a Jinja2 template with the provided context."""

@@ -23,12 +23,12 @@ async def update_resume_template_use_case(data, resume_template_manager: Manage)
             if key not in data and key not in ["updated_at"]:
                 data[key] = value
 
-        data["parent_id"] = data["id"]
-        del data["id"]
+        # data["parent_id"] = data["id"]
+        # del data["id"]
         del data["created_at"]
 
         # Create a new record in the repository
-        resume_template = await resume_template_manager.create(data)
+        resume_template = await resume_template_manager.update(data["id"], data)
         print(resume_template)
         return ResponseSuccess(resume_template)
     except ValueError as e:

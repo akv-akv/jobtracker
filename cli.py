@@ -1,31 +1,23 @@
 #! /usr/bin/env python
-# Standard Library Imports
 import asyncio
+import re
 from functools import wraps
 from pathlib import Path
 from typing import Any, Dict, Optional
 from uuid import UUID
 
-# Third-Party Imports
 import typer
 
-# Application Imports
 from manage import get_database_url
-
-# Job-related Imports
 from src.application.domain.entity.job import EmploymentType, JobStatus, WorkSettingType
 from src.application.domain.enums.country import Country
 from src.application.infrastructure.repository.job import JobRepository
-
-# Resume Main Info-related Imports
 from src.application.infrastructure.repository.resume_main_info import (
     ResumeMainInfoRepository,
 )
 from src.application.infrastructure.repository.resume_template import (
     ResumeTemplateRepository,
 )
-
-# User-related Imports
 from src.application.infrastructure.repository.user import UserRepository
 from src.application.infrastructure.sql.gateways.job import JobSQLGateway
 from src.application.infrastructure.sql.gateways.resume_main_info import (
@@ -37,8 +29,6 @@ from src.application.infrastructure.sql.gateways.resume_template import (
 from src.application.infrastructure.sql.gateways.user import UserSQLGateway
 from src.application.manage.job import ManageJob
 from src.application.manage.resume_main_info import ManageResumeMainInfo
-
-# Resume Template-related Imports
 from src.application.manage.resume_template import ManageResumeTemplate
 from src.application.manage.user import ManageUser
 from src.application.use_case.job.add_job import add_job as add_job_use_case
@@ -418,6 +408,152 @@ async def update_resume_template(
         typer.echo(f"Resume template updated successfully (id = {response.value.id}).")
     else:
         typer.echo(f"Error: {response.value}")
+
+
+def escape_latex(text: str) -> str:
+    """Escape special characters for LaTeX."""
+    replacements = {
+        "\\": r"\\textbackslash ",
+        "%": r"\%",
+        "$": r"\$",
+        "&": r"\&",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde ",
+        "^": r"\textasciicircum ",
+    }
+    # Use regex to replace all special characters
+    pattern = re.compile("|".join(re.escape(key) for key in replacements.keys()))
+    return pattern.sub(lambda x: replacements[x.group()], text)
+
+
+def escape_latex_context(context: Any) -> Any:
+    """Recursively escape LaTeX special characters in a context dictionary."""
+    if isinstance(context, dict):
+        return {k: escape_latex_context(v) for k, v in context.items()}
+    elif isinstance(context, list):
+        return [escape_latex_context(v) for v in context]
+    elif isinstance(context, str):
+        return escape_latex(context)
+    return context
+
+
+@app.command()
+@typer_async
+async def fill_template(
+    template_id: UUID = typer.Argument(..., help="ID of the resume template to fill."),
+):
+    """Fetch a template from the database, fill "
+    "it with data, and save or print the result."""
+    try:
+        # Fetch the template
+        template = await manage_resume_template.retrieve(template_id)
+        if not template:
+            typer.echo(f"Error: Template with ID {template_id} not found.")
+            raise typer.Exit(code=1)
+        # Read the data file
+        data = {
+            "applicant_name": "Alex Smith",
+            "applicant_location": "New York, NY",
+            "applicant_phone": "+1 987-654-3210",
+            "email": "alexsmith@example.com",
+            "linkedin": "linkedin.com/in/alexsmith",
+            "experiences": [
+                {
+                    "title": "Lead Data Scientist",
+                    "start_date": "Jan 2021",
+                    "end_date": "Jul 2023",
+                    "company_name": "Insight AI Solutions",
+                    "company_url": "https://insightaisolutions.com",
+                    "company_description": "a provider of AI-driven "
+                    "analytics platforms for enterprises",
+                    "location": "San Francisco, CA",
+                    "bullets": [
+                        "Developed a recommendation engine that increased "
+                        "user engagement by 30% across client platforms.",
+                        "Led a team of 10 data scientists in deploying scalable "
+                        "machine learning models using Kubernetes and TensorFlow.",
+                        "Designed an automated feature engineering "
+                        "pipeline, reducing data preparation time by 50%.",
+                    ],
+                },
+                {
+                    "title": "Business Intelligence Analyst",
+                    "start_date": "Aug 2018",
+                    "end_date": "Dec 2020",
+                    "company_name": "MarketScope Insights",
+                    "company_url": "https://marketscopeinsights.com",
+                    "company_description": "a global leader in market "
+                    "research and analytics services",
+                    "location": "Chicago, IL",
+                    "bullets": [
+                        "Built interactive dashboards in Tableau to visualize "
+                        "key market trends, reducing reporting turnaround time by 40%.",
+                        "Streamlined ETL processes, achieving a 20% "
+                        "reduction in data processing costs.",
+                        "Collaborated with product teams to identify KPIs, "
+                        "driving a 15% increase in product adoption rates.",
+                    ],
+                },
+                {
+                    "title": "Software Engineer",
+                    "start_date": "Mar 2015",
+                    "end_date": "Jul 2018",
+                    "company_name": "TechFusion Labs",
+                    "company_url": "https://techfusionlabs.com",
+                    "company_description": "an innovative software development "
+                    "firm specializing in SaaS solutions",
+                    "location": "Austin, TX",
+                    "bulletstems": [
+                        "Developed a microservices architecture for the flagship "
+                        "SaaS product, improving scalability by 3x.",
+                        "Reduced system downtime by 25% by implementing real-time"
+                        " monitoring and alerting tools.",
+                        "Mentored 5 junior developers, fostering a collaborative "
+                        "and productive team environment.",
+                    ],
+                },
+                {
+                    "title": "Data Analyst Intern",
+                    "start_date": "Jun 2014",
+                    "end_date": "Aug 2014",
+                    "company_name": "BrightData Analytics",
+                    "company_url": "https://brightdataanalytics.com",
+                    "company_description": "a startup focusing on real-time "
+                    "data analysis solutions",
+                    "location": "Boston, MA",
+                    "items": [
+                        "Conducted data cleaning and preprocessing for a 500GB "
+                        "dataset, improving analysis accuracy by 15%.",
+                        "Created data visualizations in Python to highlight trends, "
+                        "leading to actionable insights for clients.",
+                        "Implemented a basic predictive model using scikit-learn, "
+                        "which was later integrated into the core product.",
+                    ],
+                },
+            ],
+        }
+        data = escape_latex_context(data)
+        # typer.echo(data)
+
+        from src.core.gateway.template.jinja_for_latex_provider import (
+            JinjaForLatexProvider,
+        )
+        from src.core.gateway.template.template_gateway import TemplateGateway
+
+        # typer.echo(template.resume_template)
+
+        template_gateway = TemplateGateway(JinjaForLatexProvider())
+
+        filled_template = template_gateway.render(template.resume_template, data)
+
+        typer.echo(filled_template)
+
+    except Exception as e:
+        typer.echo(f"An unexpected error occurred: {e}")
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":
