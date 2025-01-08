@@ -1,6 +1,5 @@
-import * as jsyaml from './js-yaml.mjs';
+import * as jsyaml from "./js-yaml.mjs";
 
-// Country to ISO mapping function
 const countryToISO = (countryName) => {
     const isoMapping = {
         "Germany": "DE",
@@ -8,6 +7,7 @@ const countryToISO = (countryName) => {
         "Canada": "CA",
         "United Kingdom": "GB",
         "France": "FR",
+        "United Arab Emirates": "AE",
         "Remote": "N/A"
     };
     return isoMapping[countryName] || "N/A";
@@ -15,19 +15,28 @@ const countryToISO = (countryName) => {
 
 // Handle keyboard shortcut
 chrome.commands.onCommand.addListener((command) => {
-    if (command === "extract-job-details") {
+    if (command === "extract-job") {
         console.log("Keyboard shortcut triggered: Extracting job details.");
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs.length > 0) {
-                chrome.tabs.sendMessage(tabs[0].id, { action: "extract_job_details" });
+                // Inject content script if not already present
+                chrome.scripting.executeScript({
+                    target: { tabId: tabs[0].id },
+                    files: ["content.js"]
+                }, () => {
+                    // Send a message to the content script
+                    chrome.tabs.sendMessage(tabs[0].id, { action: "extract_job_details" });
+                });
+            } else {
+                console.error("No active tab found.");
             }
         });
     }
 });
 
 // Handle messages from content script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'save_yaml') {
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === "save_yaml") {
         try {
             const countryName = message.data.country || "Remote";
             const isoCode = countryToISO(countryName);
@@ -50,8 +59,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             const yamlData = jsyaml.dump(yamlTemplate);
             const dataUrl = `data:text/yaml;charset=utf-8,${encodeURIComponent(yamlData)}`;
 
-            const sanitizeFilenamePart = (part) => part.replace(/[^a-zA-Z0-9_\-]/g, "").replace(/ /g, "_").trim();
-            const filename = `${sanitizeFilenamePart(yamlTemplate.company)}_${sanitizeFilenamePart(yamlTemplate.title)}_job_details.yaml`;
+            const sanitizeFilenamePart = (part) =>
+                part.replace(/[^a-zA-Z0-9_\-]/g, "").replace(/ /g, "_").trim();
+
+            const filename = `${sanitizeFilenamePart(yamlTemplate.company)}_${sanitizeFilenamePart(
+                yamlTemplate.title
+            )}_job_details.yaml`;
 
             chrome.downloads.download({ url: dataUrl, filename });
             console.log("YAML file created and download triggered.");

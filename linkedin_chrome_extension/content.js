@@ -48,8 +48,6 @@ chrome.runtime.onMessage.addListener((message) => {
             ...extractAdditionalDetails()
         };
 
-        chrome.runtime.sendMessage({ action: "save_yaml", data: jobData }, (response) => {
-            console.log("Job data sent to background script:", jobData);
-        });
+        chrome.runtime.sendMessage({ action: "save_yaml", data: jobData });
     }
 });
