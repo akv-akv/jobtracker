@@ -56,10 +56,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // Use a `data:` URL for the download
             const dataUrl = `data:text/yaml;charset=utf-8,${encodeURIComponent(yamlData)}`;
 
+            // Helper function to sanitize filename parts
+            function sanitizeFilenamePart(part) {
+                return part.replace(/[^a-zA-Z0-9_\-]/g, "").replace(/ /g, "_").trim();
+            }
+
             // Trigger a download of the YAML file
             chrome.downloads.download({
                 url: dataUrl,
-                filename: `${yamlTemplate.company.replace(/ /g, "_")}_${yamlTemplate.title.replace(/ /g, "_")}_job_details.yaml`,
+                filename: `${sanitizeFilenamePart(yamlTemplate.company)}_${sanitizeFilenamePart(yamlTemplate.title)}_job_details.yaml`,
             });
 
             console.log('YAML file created and download triggered.');
