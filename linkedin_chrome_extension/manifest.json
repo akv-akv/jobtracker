@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Job Extractor",
+    "version": "1.0",
+    "description": "Extract job details from LinkedIn and save as a YAML file.",
+    "permissions": ["activeTab", "downloads", "scripting"],
+    "host_permissions": ["https://www.linkedin.com/jobs/*"],
+    "background": {
+      "service_worker": "background.js",
+      "type": "module"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self';"
+    },
+    "commands": {
+        "extract-job-details": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Y",
+                "mac": "Command+Shift+Y"
+            },
+            "description": "Extract job details from the current LinkedIn page"
+        }
+    }
+  }
