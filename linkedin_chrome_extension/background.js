@@ -8,17 +8,15 @@ const countryToISO = (countryName) => {
         "Canada": "CA",
         "United Kingdom": "GB",
         "France": "FR",
-        "Remote": "N/A", // You can handle remote cases explicitly
-        // Add other countries as needed
+        "Remote": "N/A"
     };
     return isoMapping[countryName] || "N/A";
 };
 
+// Handle keyboard shortcut
 chrome.commands.onCommand.addListener((command) => {
     if (command === "extract-job-details") {
         console.log("Keyboard shortcut triggered: Extracting job details.");
-
-        // Send a message to the content script to extract job details
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs.length > 0) {
                 chrome.tabs.sendMessage(tabs[0].id, { action: "extract_job_details" });
@@ -27,14 +25,13 @@ chrome.commands.onCommand.addListener((command) => {
     }
 });
 
+// Handle messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'save_yaml') {
         try {
-            // Extract and convert the country to ISO code
             const countryName = message.data.country || "Remote";
             const isoCode = countryToISO(countryName);
 
-            // Prepare the data in the required YAML template structure
             const yamlTemplate = {
                 title: message.data.title || "N/A",
                 company: message.data.company || "N/A",
@@ -47,29 +44,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 platform: "LinkedIn",
                 url: message.data.url || "N/A",
                 notes: "",
-                description: `|\n  ${message.data.description || "No description provided."}`,
+                description: `|\n  ${message.data.description || "No description provided."}`
             };
 
-            // Convert the job data to YAML format
             const yamlData = jsyaml.dump(yamlTemplate);
-
-            // Use a `data:` URL for the download
             const dataUrl = `data:text/yaml;charset=utf-8,${encodeURIComponent(yamlData)}`;
 
-            // Helper function to sanitize filename parts
-            function sanitizeFilenamePart(part) {
-                return part.replace(/[^a-zA-Z0-9_\-]/g, "").replace(/ /g, "_").trim();
-            }
+            const sanitizeFilenamePart = (part) => part.replace(/[^a-zA-Z0-9_\-]/g, "").replace(/ /g, "_").trim();
+            const filename = `${sanitizeFilenamePart(yamlTemplate.company)}_${sanitizeFilenamePart(yamlTemplate.title)}_job_details.yaml`;
 
-            // Trigger a download of the YAML file
-            chrome.downloads.download({
-                url: dataUrl,
-                filename: `${sanitizeFilenamePart(yamlTemplate.company)}_${sanitizeFilenamePart(yamlTemplate.title)}_job_details.yaml`,
-            });
-
-            console.log('YAML file created and download triggered.');
+            chrome.downloads.download({ url: dataUrl, filename });
+            console.log("YAML file created and download triggered.");
         } catch (error) {
-            console.error('Error while converting data to YAML:', error);
+            console.error("Error while converting data to YAML:", error);
         }
     }
 });
